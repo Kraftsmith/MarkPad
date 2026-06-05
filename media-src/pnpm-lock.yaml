@@ -17,6 +17,9 @@ importers:
       '@testing-library/user-event':
         specifier: ^13.1.5
         version: 13.5.0(@testing-library/dom@7.31.2)
+      bpmn-visualization:
+        specifier: ^0.47.0
+        version: 0.47.0
       date-fns:
         specifier: ^2.21.1
         version: 2.30.0
@@ -81,6 +84,9 @@ packages:
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
 
+  '@typed-mxgraph/typed-mxgraph@1.0.8':
+    resolution: {integrity: sha512-rzTbmD/XofRq0YZMY/BU9cjbCTw9q8rpIvWRhQO0DcgCx3+rpHTsVOk3pfuhcnUigUYNFkljmDkRuVjbl7zZoQ==}
+
   '@types/aria-query@4.2.2':
     resolution: {integrity: sha512-HnYpAE1Y6kRyKM/XkEuiRQhTHvkzMBurTHnpFLYLBGPIylZNPs9jJcuOOYWxPLJCSEtmZT0Y8rHDokKN7rRTig==}
 
@@ -114,6 +120,9 @@ packages:
     resolution: {integrity: sha512-o/HelwhuKpTj/frsOsbNLNgnNGVIFsVP/SW2BSF14gVl7kAfMOJ6/8wUAUvG1R1NHKrfG+2sHZTu0yauT1qBrA==}
     engines: {node: '>=6.0'}
 
+  bpmn-visualization@0.47.0:
+    resolution: {integrity: sha512-yM2kRLoXKT+NcCBLwSfwIOk/knHGmsXBcFhk7rCCa4ycJMRM+bfJqFBljz1Jki2XQLBV6Rr+YQoEoSXzTOr77A==}
+
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
@@ -137,6 +146,9 @@ packages:
 
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
+
+  es-toolkit@1.39.10:
+    resolution: {integrity: sha512-E0iGnTtbDhkeczB0T+mxmoVlT4YNweEKBLq7oaU4p11mecdsZpNWOglI4895Vh4usbQ+LsJiuLuI2L0Vdmfm2w==}
 
   esbuild-android-64@0.14.54:
     resolution: {integrity: sha512-Tz2++Aqqz0rJ7kYBfz+iqyE3QMycD4vk7LBRyWaAVFgFtQ/O8EJOnVmTOiDWYZ/uYzB4kvP+bqejYdVKzE5lAQ==}
@@ -263,6 +275,10 @@ packages:
     engines: {node: '>=12'}
     hasBin: true
 
+  fast-xml-parser@5.2.5:
+    resolution: {integrity: sha512-pfX9uG9Ki0yekDHx2SiuRIyFdyAr1kMIMitPvb0YBo8SUfKvia7w7FIyd/l6av85pFYRhZscS75MwMnbvY+hcQ==}
+    hasBin: true
+
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
@@ -283,6 +299,10 @@ packages:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
 
+  mxgraph@4.2.2:
+    resolution: {integrity: sha512-FrJc5AxzXSqiQNF+8CyJk6VxuKO4UVPgw32FZuFZ3X9W+JqOAQBTokZhh0ZkEqGpEOyp3z778ssmBTvdrTAdqw==}
+    deprecated: Package no longer supported. Use at your own risk
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -292,6 +312,9 @@ packages:
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+
+  strnum@2.3.0:
+    resolution: {integrity: sha512-ums3KNd42PGyx5xaoVTO1mjU1bH3NpY4vsrVlnv9PNGqQj8wd7rJ6nEypLrJ7z5vxK5RP0yMLo6J/Gsm62DI5Q==}
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -348,6 +371,8 @@ snapshots:
       '@babel/runtime': 7.29.2
       '@testing-library/dom': 7.31.2
 
+  '@typed-mxgraph/typed-mxgraph@1.0.8': {}
+
   '@types/aria-query@4.2.2': {}
 
   '@types/istanbul-lib-coverage@2.0.6': {}
@@ -379,6 +404,13 @@ snapshots:
       '@babel/runtime': 7.29.2
       '@babel/runtime-corejs3': 7.29.2
 
+  bpmn-visualization@0.47.0:
+    dependencies:
+      '@typed-mxgraph/typed-mxgraph': 1.0.8
+      es-toolkit: 1.39.10
+      fast-xml-parser: 5.2.5
+      mxgraph: 4.2.2
+
   chalk@4.1.2:
     dependencies:
       ansi-styles: 4.3.0
@@ -399,6 +431,8 @@ snapshots:
   diff-match-patch@1.0.5: {}
 
   dom-accessibility-api@0.5.16: {}
+
+  es-toolkit@1.39.10: {}
 
   esbuild-android-64@0.14.54:
     optional: true
@@ -484,6 +518,10 @@ snapshots:
       esbuild-windows-64: 0.14.54
       esbuild-windows-arm64: 0.14.54
 
+  fast-xml-parser@5.2.5:
+    dependencies:
+      strnum: 2.3.0
+
   has-flag@4.0.0: {}
 
   jquery-confirm@3.3.4:
@@ -498,6 +536,8 @@ snapshots:
 
   lz-string@1.5.0: {}
 
+  mxgraph@4.2.2: {}
+
   picocolors@1.1.1: {}
 
   pretty-format@26.6.2:
@@ -508,6 +548,8 @@ snapshots:
       react-is: 17.0.2
 
   react-is@17.0.2: {}
+
+  strnum@2.3.0: {}
 
   supports-color@7.2.0:
     dependencies:

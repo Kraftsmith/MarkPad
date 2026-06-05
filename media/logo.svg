@@ -1,0 +1,23 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MarkPad">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Tile -->
+  <rect x="2" y="2" width="124" height="124" rx="28" fill="url(#bg)"/>
+  <rect x="2.75" y="2.75" width="122.5" height="122.5" rx="27.25" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="1.5"/>
+
+  <!-- Markdown mark -->
+  <g transform="translate(-2 0)">
+    <!-- M -->
+    <path d="M30 86 V42 L48 66 L66 42 V86"
+          fill="none" stroke="#FFFFFF" stroke-width="11"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Down arrow -->
+    <rect x="82" y="42" width="11" height="22" rx="2" fill="#FFFFFF"/>
+    <path d="M72.5 60 H103 L87.75 86 Z" fill="#FFFFFF"/>
+  </g>
+</svg>

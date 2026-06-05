@@ -10,6 +10,33 @@ body,
   height: 100%;
   width: 100%;
 }
+/* BPMN diagram preview (```bpmn code blocks, rendered by bpmn-visualization) */
+.markpad-bpmn {
+  width: 100%;
+  height: 380px;
+  margin: 8px 0 16px;
+  border: 1px solid var(--vscode-panel-border, rgba(128, 128, 128, 0.35));
+  border-radius: 6px;
+  background: #ffffff;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.markpad-bpmn > div,
+.markpad-bpmn svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.markpad-bpmn--error {
+  height: auto;
+  padding: 8px 12px;
+  background: rgba(255, 76, 76, 0.08);
+  border-color: rgba(255, 76, 76, 0.5);
+  color: #d33;
+  font-family: var(--vscode-editor-font-family), monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
 body[data-use-vscode-theme-color="1"] .vditor {
   --panel-background-color: var(--vscode-editor-background);
   --toolbar-background-color: var(--vscode-editor-background);

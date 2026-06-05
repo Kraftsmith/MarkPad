@@ -15,6 +15,7 @@
     "@babel/runtime-corejs3": "^7.13.17",
     "@testing-library/dom": "^7.30.4",
     "@testing-library/user-event": "^13.1.5",
+    "bpmn-visualization": "^0.47.0",
     "date-fns": "^2.21.1",
     "esbuild": "^0.14.54",
     "jquery": "^3.6.0",

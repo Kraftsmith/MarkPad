@@ -19,6 +19,7 @@ import { toolbar } from './toolbar'
 // import { fixTableIr } from './fix-table-ir'
 import { enableTableResize } from './table-resize'
 import { enableTableAddColumn } from './table-add-column'
+import { enableBpmnRender } from './bpmn'
 import './main.css'
 
 function initVditor(msg) {
@@ -65,6 +66,7 @@ function initVditor(msg) {
       fixPanelHover()
       enableTableResize()
       enableTableAddColumn()
+      enableBpmnRender()
     },
     input() {
       inputTimer && clearTimeout(inputTimer)
