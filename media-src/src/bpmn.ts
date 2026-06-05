@@ -48,6 +48,53 @@ function anchorFor(code: HTMLElement): HTMLElement {
   )
 }
 
+// bpmn-visualization does NOT read "BPMN in Color" attributes from the XML, so
+// we parse them ourselves and apply them through its styling API. Supports the
+// OMG standard (color:background-color / color:border-color) and the bpmn.io
+// fallback (bioc:fill / bioc:stroke).
+function attrByLocalName(el: Element, local: string): string | null {
+  for (let i = 0; i < el.attributes.length; i++) {
+    const a = el.attributes[i]
+    if (a.localName === local) return a.value
+  }
+  return null
+}
+
+function applyBpmnColors(viz: BpmnVisualization, xml: string) {
+  let doc: Document
+  try {
+    doc = new DOMParser().parseFromString(xml, 'application/xml')
+  } catch {
+    return
+  }
+  if (doc.getElementsByTagName('parsererror').length) return
+
+  const all = doc.getElementsByTagName('*')
+  for (let i = 0; i < all.length; i++) {
+    const el = all[i]
+    const isEdge = el.localName === 'BPMNEdge'
+    if (el.localName !== 'BPMNShape' && !isEdge) continue
+    const id = el.getAttribute('bpmnElement')
+    if (!id) continue
+
+    const fill =
+      attrByLocalName(el, 'background-color') || attrByLocalName(el, 'fill')
+    const stroke =
+      attrByLocalName(el, 'border-color') || attrByLocalName(el, 'stroke')
+
+    const style: any = {}
+    if (stroke) style.stroke = { color: stroke }
+    if (fill && !isEdge) style.fill = { color: fill }
+    if (style.fill || style.stroke) {
+      try {
+        viz.bpmnElementsRegistry.updateStyle(id, style)
+      } catch {
+        /* unknown id / unsupported element — ignore */
+      }
+    }
+  }
+}
+
 function renderInto(container: HTMLElement, xml: string, hash: string) {
   container.classList.remove(ERROR_CLASS)
   if (!xml) {
@@ -66,6 +113,7 @@ function renderInto(container: HTMLElement, xml: string, hash: string) {
       navigation: { enabled: false },
     })
     viz.load(xml, { fit: { type: FitType.Center, margin: 20 } })
+    applyBpmnColors(viz, xml)
     if (svgCache.size >= MAX_CACHE) {
       svgCache.delete(svgCache.keys().next().value as string)
     }
