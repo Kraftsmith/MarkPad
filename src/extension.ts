@@ -11,10 +11,41 @@ function showError(msg: string) {
   vscode.window.showErrorMessage(`[MarkPad] ${msg}`)
 }
 
+/**
+ * Open a link clicked inside the webview. `href` is the raw markdown URL (the
+ * unresolved href attribute), and `docFsPath` is the markdown file it lives in.
+ * - Scheme URLs (http:, https:, mailto:, file:, ...) are handed to VS Code as-is.
+ * - Pure in-document anchors (`#section`) have nothing to open on disk and are
+ *   ignored (scrolling to the heading would require matching Vditor's generated
+ *   ids — left as a follow-up).
+ * - Everything else is treated as a path relative to the markdown file.
+ */
+function openLink(href: string, docFsPath: string) {
+  if (!href) return
+  // Absolute URL with a scheme — let VS Code route it (browser, mail client, ...).
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href)) {
+    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(href))
+    return
+  }
+  if (href.startsWith('#')) return
+  // Relative/local path — resolve against the file's folder, dropping any
+  // trailing #fragment, and open the target.
+  let rel = href.split('#')[0]
+  try {
+    rel = decodeURIComponent(rel)
+  } catch {
+    /* keep the raw value if it isn't valid percent-encoding */
+  }
+  const target = NodePath.resolve(docFsPath, '..', rel)
+  vscode.commands.executeCommand('vscode.open', vscode.Uri.file(target))
+}
+
 export function activate(context: vscode.ExtensionContext) {
-  // Set default auto-select family attempt timeout to 1000ms
-  if (typeof net.setDefaultAutoSelectFamilyAttemptTimeout === 'function') {
-    net.setDefaultAutoSelectFamilyAttemptTimeout(1000)
+  // Set default auto-select family attempt timeout to 1000ms.
+  // Cast: this Node 18+ API isn't in the pinned @types/node@12.
+  const netAny = net as any
+  if (typeof netAny.setDefaultAutoSelectFamilyAttemptTimeout === 'function') {
+    netAny.setDefaultAutoSelectFamilyAttemptTimeout(1000)
   }
 
   // Register original command (used by context menu/shortcuts)
@@ -291,11 +322,7 @@ class EditorPanel {
             break
           }
           case 'open-link': {
-            let url = message.href
-            if (!/^http/.test(url)) {
-              url = NodePath.resolve(this._fsPath, '..', url)
-            }
-            vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url))
+            openLink(message.href, this._fsPath)
             break
           }
         }
@@ -567,11 +594,7 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           break
         }
         case 'open-link': {
-          let url = message.href
-          if (!/^http/.test(url)) {
-            url = NodePath.resolve(uri.fsPath, '..', url)
-          }
-          vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url))
+          openLink(message.href, uri.fsPath)
           break
         }
       }

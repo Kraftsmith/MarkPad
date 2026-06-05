@@ -8,16 +8,15 @@
 
 ## Features
 
-1. What You See Is What You Get (WYSIWYG)
-2. Auto sync changes between the VSCode editor and webview
-3. Copy markdown/html
-4. Uploaded/pasted/drag-dropped images will be auto-saved to the `assets` folder
-5. Multi-theme support
-6. Shortcut keys
-7. Multiple editti[](https://)ng modes: instant Rendering mode (**Recommand!**) / WYSIWYG mode / split screen mode
-8. Markdown extensions
-9. Multiple graph support including KaTeX / Mermaid / Graphviz / ECharts / abc.js(notatioan) / ...
-10. For more usage please see [vditor](https://github.com/Vanessa219/vditor)
+- **True WYSIWYG editing** with three modes — instant-rendering (default), full WYSIWYG, and split-screen preview.
+- **Live two-way sync** with VS Code's native editor: edits on either side stay in sync, and saving writes straight back to the file.
+- **Opens like a built-in editor** — via the Command Palette, a keybinding (`Ctrl/Cmd+Shift+Alt+M`), the Explorer or editor-tab context menu, or _Open With…_; can be set as the default editor for `.md` files.
+- **Theme-aware** — automatically matches your active VS Code color theme.
+- **Copy as Markdown or HTML** straight from the toolbar.
+- **Smart image handling** — paste, drag-and-drop, or upload images and have them auto-saved to a configurable assets folder.
+- **Diagrams, charts & math** — render fenced code blocks with Mermaid, Apache ECharts, Graphviz, PlantUML, flowchart.js, abc.js (music notation), SMILES (chemical structures), and ECharts-powered mind maps, plus KaTeX / MathJax math.
+- **Extended Markdown** — tables, task lists, footnotes, and syntax-highlighted code blocks.
+- **Personalizable** — apply your own styling with `markpad.customCss`.
 
 ## Install
 

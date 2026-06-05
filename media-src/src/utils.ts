@@ -105,13 +105,19 @@ export function handleToolbarClick() {
 
 export function fixLinkClick() {
   const openLink = (url: string) => {
+    if (!url) return
     vscode.postMessage({ command: 'open-link', href: url })
   }
-  document.addEventListener('click', e=> {
-    let el = e.target as HTMLAnchorElement
-    if (el.tagName === 'A') {
-      openLink(el.href)
-    }
+  document.addEventListener('click', (e) => {
+    // Resolve the anchor even when the click lands on a child node (bold text,
+    // inline code, an image, ...) inside the link.
+    const anchor = (e.target as HTMLElement)?.closest?.('a') as HTMLAnchorElement | null
+    if (!anchor) return
+    // Send the raw href attribute, NOT the resolved `.href` property. The
+    // property is resolved against the webview's <base>, which rewrites a
+    // relative `other.md` into an un-openable vscode-resource URL. The
+    // extension host resolves relative paths against the document itself.
+    openLink(anchor.getAttribute('href') || '')
   })
   window.open = (url: string, ...args: any[]) => {
     openLink(url)
