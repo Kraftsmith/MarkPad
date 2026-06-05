@@ -2,10 +2,6 @@
 
 [![badge_title](https://vsmarketplacebadges.dev/version-short/Ship-Lab.markpad.png)](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad) [![](https://vsmarketplacebadges.dev/installs-short/Ship-Lab.markpad.png)](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad) [![](https://vsmarketplacebadges.dev/rating-short/Ship-Lab.markpad.png)](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad)
 
-## Demo
-
-![demo](./demo.gif)
-
 ## Features
 
 - **True WYSIWYG editing** with three modes — instant-rendering (default), full WYSIWYG, and split-screen preview.
@@ -21,10 +17,6 @@
 ## Install
 
 [https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad)
-
-## Supported syntax
-
-[demo article](https://ld246.com/guide/markdown)
 
 ## Usage
 
@@ -68,13 +60,7 @@ Edit your settings.json and add
 
 ## Acknowledgement
 
-- [vscode](https://github.com/microsoft/vscode)
-- [vditor](https://github.com/Vanessa219/vditor)
-
-
-## Todo
-
-- [ ] Using [Custom Text Editor](https://code.visualstudio.com/api/extension-guides/custom-editors#custom-text-editor) ([demo](https://github.com/gera2ld/markmap-vscode))
+MarkPad is built on the Vditor editor, embedded in a VS Code webview.
 
 ## License
 
