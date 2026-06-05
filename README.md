@@ -11,6 +11,7 @@
 - **Copy as Markdown or HTML** straight from the toolbar.
 - **Smart image handling** — paste, drag-and-drop, or upload images and have them auto-saved to a configurable assets folder.
 - **Diagrams, charts & math** — render fenced code blocks with Mermaid, Apache ECharts, Graphviz, PlantUML, flowchart.js, abc.js (music notation), SMILES (chemical structures), and ECharts-powered mind maps, plus KaTeX / MathJax math.
+- **BPMN diagrams** — render `bpmn` fenced blocks (BPMN 2.0 XML) as process diagrams, including colored pools, lanes and elements via _BPMN in Color_.
 - **Extended Markdown** — tables, task lists, footnotes, and syntax-highlighted code blocks.
 - **Personalizable** — apply your own styling with `markpad.customCss`.
 
