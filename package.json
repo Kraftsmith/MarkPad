@@ -1,0 +1,119 @@
+{
+  "name": "markpad",
+  "displayName": "MarkPad",
+  "icon": "media/logo.png",
+  "description": "A full-featured WYSIWYG editor for markdown, based on Vditor.",
+  "version": "0.1.14",
+  "publisher": "Ship-Lab",
+  "author": {
+    "name": "Mikhail Sarokin",
+    "email": "sorokin.mike@gmail.com"
+  },
+  "private": true,
+  "engines": {
+    "vscode": "^1.47.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "markdown",
+    "editor",
+    "wysiwyg",
+    "typora",
+    "markdown-previewer",
+    "markdown-editor"
+  ],
+  "activationEvents": [
+    "onCommand:markpad.openEditor",
+    "onWebviewPanel:markpad",
+    "onLanguage:markdown",
+    "onCustomEditor:markpad.customEditor"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kraftsmith/MarkPad.git"
+  },
+  "main": "out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "markpad.openEditor",
+        "title": "Open with MarkPad",
+        "category": "MarkPad"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceLangId == markdown",
+          "command": "markpad.openEditor",
+          "group": "navigation"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "when": "resourceLangId == markdown",
+          "command": "markpad.openEditor",
+          "group": "1_open"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "markpad.customEditor",
+        "displayName": "MarkPad",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          },
+          {
+            "filenamePattern": "*.markdown"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "configuration": {
+      "title": "MarkPad",
+      "properties": {
+        "markpad.imageSaveFolder": {
+          "type": "string",
+          "default": "assets",
+          "description": "Save images to which folder when upload in markdown, default relative to the markdown file, you can set to project root via `${projectRoot}/assets`."
+        },
+        "markpad.useVscodeThemeColor": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use vscode theme's background color as the markdown editor's background color."
+        },
+        "markpad.customCss": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "key": "ctrl+shift+alt+m",
+        "command": "markpad.openEditor",
+        "mac": "cmd+shift+alt+m",
+        "when": "editorTextFocus && editorLangId == markdown"
+      }
+    ]
+  },
+  "scripts": {
+    "watch": "foy watch",
+    "start": "foy watch",
+    "pub": "foy build && npm version patch && git push origin master --tags && vsce package && vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.0",
+    "@types/vscode": "^1.47.0",
+    "foy": "^0.2.5",
+    "ts-node": "9.1.1",
+    "typescript": "^4.2.2"
+  },
+  "packageManager": "pnpm@9.7.1"
+}

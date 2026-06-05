@@ -1,0 +1,12 @@
+.vscode
+.github
+media-src
+node_modules
+src
+.gitignore
+tsconfig.json
+webpack.config.js
+esbuild.js
+Foyfile.ts
+yarn.lock
+yarn-error.log

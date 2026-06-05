@@ -1,0 +1,40 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "watch-extension",
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"isBackground": true,
+			"presentation": {
+				"reveal": "silent"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "watch-webview",
+			"type": "npm",
+			"script": "start",
+			"path": "media-src/",
+			"options": {
+				"packageManager": "pnpm"
+			},
+			"problemMatcher": [],
+			"isBackground": true,
+			"presentation": {
+				"reveal": "silent"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
