@@ -29,25 +29,6 @@ function hashXml(s: string): string {
 const svgCache = new Map<string, string>()
 const MAX_CACHE = 30
 
-function bpmnCodeElements(root: HTMLElement): HTMLElement[] {
-  // Vditor adds `language-<lang>` to the <code> element in IR / WYSIWYG / SV.
-  return Array.from(
-    root.querySelectorAll<HTMLElement>('code[class~="language-bpmn"]')
-  )
-}
-
-// The editable source lives inside this wrapper — we attach the diagram *after*
-// the whole block, never inside it.
-function anchorFor(code: HTMLElement): HTMLElement {
-  return (
-    (code.closest(
-      '.vditor-ir__node, .vditor-wysiwyg__block, .vditor-sv'
-    ) as HTMLElement) ||
-    (code.closest('pre') as HTMLElement) ||
-    code
-  )
-}
-
 // bpmn-visualization does NOT read "BPMN in Color" attributes from the XML, so
 // we parse them ourselves and apply them through its styling API. Supports the
 // OMG standard (color:background-color / color:border-color) and the bpmn.io
@@ -95,6 +76,44 @@ function applyBpmnColors(viz: BpmnVisualization, xml: string) {
   }
 }
 
+// Drop consecutive duplicate <di:waypoint>s. Zero-length edge segments can
+// break the rendering engine, and generated / auto-laid-out BPMN often has them.
+function sanitizeBpmnXml(xml: string): string {
+  let doc: Document
+  try {
+    doc = new DOMParser().parseFromString(xml, 'application/xml')
+  } catch {
+    return xml
+  }
+  if (doc.getElementsByTagName('parsererror').length) return xml
+
+  let changed = false
+  const all = doc.getElementsByTagName('*')
+  for (let i = 0; i < all.length; i++) {
+    if (all[i].localName !== 'BPMNEdge') continue
+    let prevX: string | null = null
+    let prevY: string | null = null
+    for (const wp of Array.from(all[i].children)) {
+      if (wp.localName !== 'waypoint') continue
+      const x = wp.getAttribute('x')
+      const y = wp.getAttribute('y')
+      if (x === prevX && y === prevY) {
+        wp.remove()
+        changed = true
+      } else {
+        prevX = x
+        prevY = y
+      }
+    }
+  }
+  if (!changed) return xml
+  try {
+    return new XMLSerializer().serializeToString(doc)
+  } catch {
+    return xml
+  }
+}
+
 function renderInto(container: HTMLElement, xml: string, hash: string) {
   container.classList.remove(ERROR_CLASS)
   if (!xml) {
@@ -112,13 +131,15 @@ function renderInto(container: HTMLElement, xml: string, hash: string) {
       container,
       navigation: { enabled: false },
     })
-    viz.load(xml, { fit: { type: FitType.Center, margin: 20 } })
+    viz.load(sanitizeBpmnXml(xml), { fit: { type: FitType.Center, margin: 20 } })
     applyBpmnColors(viz, xml)
     if (svgCache.size >= MAX_CACHE) {
       svgCache.delete(svgCache.keys().next().value as string)
     }
     svgCache.set(hash, container.innerHTML)
   } catch (e) {
+    // Surface the real cause — generated BPMN often has subtle issues.
+    console.error('[MarkPad] BPMN render failed:', e)
     container.classList.add(ERROR_CLASS)
     container.textContent =
       'BPMN render error: ' + (e instanceof Error ? e.message : String(e))
@@ -128,25 +149,36 @@ function renderInto(container: HTMLElement, xml: string, hash: string) {
 function refresh(root: HTMLElement) {
   const live = new Set<HTMLElement>()
 
-  bpmnCodeElements(root).forEach((code) => {
-    const xml = (code.textContent || '').trim()
-    const anchor = anchorFor(code)
+  // Vditor renders each code block's output into `pre.vditor-ir__preview`
+  // (shown when the block isn't focused). For a `bpmn` block we render the
+  // diagram into that preview; the raw XML there is hidden via CSS, and Vditor
+  // reveals the editable source only while the block is being edited.
+  root
+    .querySelectorAll<HTMLElement>('pre.vditor-ir__preview')
+    .forEach((preview) => {
+      const code = preview.querySelector<HTMLElement>(
+        'code[class~="language-bpmn"]'
+      )
+      if (!code) return
+      const xml = (code.textContent || '').trim()
 
-    let container = anchor.nextElementSibling as HTMLElement | null
-    if (!container || !container.classList.contains(CONTAINER_CLASS)) {
-      container = document.createElement('div')
-      container.className = CONTAINER_CLASS
-      container.contentEditable = 'false'
-      anchor.parentNode?.insertBefore(container, anchor.nextSibling)
-    }
-    live.add(container)
+      let container = preview.querySelector<HTMLElement>(
+        ':scope > .' + CONTAINER_CLASS
+      )
+      if (!container) {
+        container = document.createElement('div')
+        container.className = CONTAINER_CLASS
+        container.contentEditable = 'false'
+        preview.appendChild(container)
+      }
+      live.add(container)
 
-    const hash = hashXml(xml)
-    if (container.getAttribute(HASH_ATTR) !== hash) {
-      container.setAttribute(HASH_ATTR, hash)
-      renderInto(container, xml, hash)
-    }
-  })
+      const hash = hashXml(xml)
+      if (container.getAttribute(HASH_ATTR) !== hash) {
+        container.setAttribute(HASH_ATTR, hash)
+        renderInto(container, xml, hash)
+      }
+    })
 
   // Drop diagrams whose source block was removed.
   root

@@ -11,6 +11,14 @@ body,
   width: 100%;
 }
 /* BPMN diagram preview (```bpmn code blocks, rendered by bpmn-visualization) */
+/* Hide the raw XML inside the IR preview — show only the rendered diagram */
+pre.vditor-ir__preview > code[class~="language-bpmn"] {
+  display: none;
+}
+pre.vditor-ir__preview:has(> .markpad-bpmn) {
+  padding: 0;
+  background: transparent;
+}
 .markpad-bpmn {
   width: 100%;
   height: 380px;
