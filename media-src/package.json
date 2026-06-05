@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": "true",
   "scripts": {
-    "start": "esbuild ./src/main.ts --bundle --watch --sourcemap --outdir=../media/dist",
-    "build": "node -e \"require('fs').rmSync('../media/dist', { recursive: true, force: true });\" && esbuild ./src/main.ts --bundle --minify --sourcemap --outdir=../media/dist"
+    "start": "node esbuild.js --watch",
+    "build": "node -e \"require('fs').rmSync('../media/dist', { recursive: true, force: true });\" && node esbuild.js"
   },
   "browserslist": "> 0%",
   "devDependencies": {
