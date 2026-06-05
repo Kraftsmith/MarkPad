@@ -3,7 +3,7 @@
   "displayName": "MarkPad",
   "icon": "media/logo.png",
   "description": "A full-featured WYSIWYG editor for markdown, based on Vditor.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "Ship-Lab",
   "author": {
     "name": "Mikhail Sarokin",
