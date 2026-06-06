@@ -1,6 +1,51 @@
 import { t } from "./lang"
 import { confirm } from "./utils"
 
+// Build a self-rendering HTML document from the current content. Mirrors
+// Vditor's own exportHTML template (diagrams re-render from the CDN), but the
+// caller routes it to the extension host for saving / printing, because a VS
+// Code webview can't trigger browser downloads. `bpmn` blocks export as code —
+// MarkPad's BPMN renderer isn't part of this standalone output yet.
+function buildExportHtml(autoPrint: boolean): string {
+  const v: any = vditor as any
+  const opts = (v.vditor && v.vditor.options) || {}
+  const cdn = opts.cdn || 'https://cdn.jsdelivr.net/npm/vditor'
+  const content = vditor.getHTML()
+  const printScript = autoPrint
+    ? `\n<script>window.addEventListener('load', function () { setTimeout(function () { window.print() }, 700) })</script>`
+    : ''
+  // Always export LIGHT: the editor may be in dark mode, but a standalone
+  // document / printout should be dark text on a white page. Forcing the light
+  // content theme + a light code theme + a white background avoids the washed-out
+  // "dark text colors on white" result.
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="${cdn}/dist/index.css"/>
+<script src="${cdn}/dist/method.min.js"></script>
+<style>
+  html, body { background: #ffffff; margin: 0; }
+  body { padding: 24px; }
+  .vditor-reset { max-width: 860px; margin: 0 auto; color: #1f2328; background: #ffffff; }
+</style></head>
+<body><div class="vditor-reset" id="preview">${content}</div>
+<script>
+  var el = document.getElementById('preview');
+  Vditor.setContentTheme('light', '${cdn}/dist/css/content-theme');
+  Vditor.codeRender(el);
+  Vditor.highlightRender({ style: 'github' }, el, '${cdn}');
+  Vditor.mathRender(el, { cdn: '${cdn}' });
+  Vditor.mermaidRender(el, '${cdn}', 'classic');
+  Vditor.SMILESRender(el, '${cdn}', 'classic');
+  Vditor.markmapRender(el, '${cdn}');
+  Vditor.flowchartRender(el, '${cdn}');
+  Vditor.graphvizRender(el, '${cdn}');
+  Vditor.chartRender(el, '${cdn}', 'classic');
+  Vditor.mindmapRender(el, '${cdn}', 'classic');
+  Vditor.abcRender(el, '${cdn}');
+</script>${printScript}
+</body></html>`
+}
+
 export const toolbar = [
 	{
 		hotkey: '⌘s',
@@ -113,6 +158,28 @@ export const toolbar = [
 							})
 						}
 					})
+				},
+			},
+			{
+				name: 'export-html',
+				icon: 'Export HTML',
+				click() {
+					try {
+						vscode.postMessage({ command: 'export', format: 'html', content: buildExportHtml(false) })
+					} catch (error) {
+						vscode.postMessage({ command: 'error', content: `Export HTML failed! ${error.message}` })
+					}
+				},
+			},
+			{
+				name: 'export-pdf',
+				icon: 'Export PDF',
+				click() {
+					try {
+						vscode.postMessage({ command: 'export', format: 'pdf', content: buildExportHtml(true) })
+					} catch (error) {
+						vscode.postMessage({ command: 'error', content: `Export PDF failed! ${error.message}` })
+					}
 				},
 			},
 			'devtools',

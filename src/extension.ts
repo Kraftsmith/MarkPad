@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import * as NodePath from 'path'
 import * as net from 'net'
+import * as os from 'os'
 const KeyVditorOptions = 'vditor.options'
 
 function debug(...args: any[]) {
@@ -38,6 +39,40 @@ function openLink(href: string, docFsPath: string) {
   }
   const target = NodePath.resolve(docFsPath, '..', rel)
   vscode.commands.executeCommand('vscode.open', vscode.Uri.file(target))
+}
+
+/**
+ * Export the webview-rendered HTML. A VS Code webview can't trigger browser
+ * downloads, so the document content is sent here:
+ * - `html`: prompt with a Save dialog and write the file.
+ * - `pdf`: write a temp HTML and open it in the default browser, which
+ *   auto-opens the print dialog (the user picks "Save as PDF").
+ */
+async function handleExport(message: any, fsPath: string) {
+  const content: string = message.content || ''
+  if (!content) {
+    showError('Nothing to export')
+    return
+  }
+  if (message.format === 'html') {
+    const base = (fsPath || 'export').replace(/\.(md|markdown)$/i, '')
+    const target = await vscode.window.showSaveDialog({
+      defaultUri: vscode.Uri.file(`${base}.html`),
+      filters: { HTML: ['html'] },
+    })
+    if (!target) return
+    await vscode.workspace.fs.writeFile(target, Buffer.from(content, 'utf8'))
+    vscode.window.showInformationMessage(`MarkPad: exported HTML → ${target.fsPath}`)
+  } else {
+    const tmp = vscode.Uri.file(
+      NodePath.join(os.tmpdir(), `markpad-export-${Date.now()}.html`)
+    )
+    await vscode.workspace.fs.writeFile(tmp, Buffer.from(content, 'utf8'))
+    await vscode.env.openExternal(tmp)
+    vscode.window.showInformationMessage(
+      'MarkPad: opening the export in your browser — use Print → Save as PDF.'
+    )
+  }
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -325,6 +360,10 @@ class EditorPanel {
             openLink(message.href, this._fsPath)
             break
           }
+          case 'export': {
+            await handleExport(message, this._fsPath)
+            break
+          }
         }
       },
       null,
@@ -595,6 +634,10 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
         case 'open-link': {
           openLink(message.href, uri.fsPath)
+          break
+        }
+        case 'export': {
+          await handleExport(message, uri.fsPath)
           break
         }
       }

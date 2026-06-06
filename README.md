@@ -61,9 +61,16 @@ Edit your settings.json and add
 
 ## Release Notes
 
-### 0.2.1
-- BPMN diagrams now render **in place of the source** — the raw XML is hidden and only shown while you're editing the block (just click into the diagram).
-- More robust BPMN rendering: tolerates imperfect / auto-generated layouts (e.g. duplicate edge waypoints) and reports clearer errors.
+### 0.2.4
+- **Export to HTML and PDF** — new options in the toolbar's `⋯` menu. _Export HTML_ saves a standalone, light-themed `.html`; _Export PDF_ opens a print-ready view (choose **Save as PDF**).
+
+### 0.2.3
+- **Tab in the last table cell adds a new row** (Word / Excel style), with the caret placed in the first cell.
+
+### 0.2.2
+- **Default markdown editor** — MarkPad now opens `.md` files by default (previously opt-in via _Open With…_).
+- Open MarkPad from the **editor right-click menu** as well.
+- BPMN diagrams render **in place of the source** — the raw XML is hidden and only shown while you're editing the block — with more robust handling of imperfect / auto-generated layouts.
 
 ### 0.2.0
 - **BPMN diagram support** — render `bpmn` fenced blocks (BPMN 2.0 XML) with colored pools, lanes and elements via _BPMN in Color_.
