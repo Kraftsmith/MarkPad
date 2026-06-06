@@ -59,6 +59,19 @@ Edit your settings.json and add
 // Eg: "markpad.customCss": ".vditor-ir pre.vditor-reset {line-height: 32px;padding-right: calc(100% - 800px) !important; margin-left: 100px;    font-family: system-ui !important;}"
 ```
 
+## Release Notes
+
+### 0.2.1
+- BPMN diagrams now render **in place of the source** — the raw XML is hidden and only shown while you're editing the block (just click into the diagram).
+- More robust BPMN rendering: tolerates imperfect / auto-generated layouts (e.g. duplicate edge waypoints) and reports clearer errors.
+
+### 0.2.0
+- **BPMN diagram support** — render `bpmn` fenced blocks (BPMN 2.0 XML) with colored pools, lanes and elements via _BPMN in Color_.
+- New MarkPad icon.
+
+### 0.1.14
+- Initial release of MarkPad — a full-featured WYSIWYG markdown editor for VS Code, built on Vditor.
+
 ## Acknowledgement
 
 MarkPad is built on the Vditor editor, embedded in a VS Code webview.
