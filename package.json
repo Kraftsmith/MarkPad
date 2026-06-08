@@ -2,7 +2,7 @@
   "name": "markpad",
   "displayName": "MarkPad",
   "icon": "media/logo.png",
-  "description": "A full-featured WYSIWYG editor for markdown, based on Vditor.",
+  "description": "A full-featured Visual markdown editor",
   "version": "0.2.5",
   "publisher": "Ship-Lab",
   "author": {

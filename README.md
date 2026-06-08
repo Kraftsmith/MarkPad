@@ -1,4 +1,4 @@
-# MarkPad — A full-featured WYSIWYG editor for markdown
+# MarkPad — A full-featured Visual markdown editor
 
 [![badge_title](https://vsmarketplacebadges.dev/version-short/Ship-Lab.markpad.png)](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad) [![](https://vsmarketplacebadges.dev/installs-short/Ship-Lab.markpad.png)](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad) [![](https://vsmarketplacebadges.dev/rating-short/Ship-Lab.markpad.png)](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad)
 
@@ -66,7 +66,6 @@ Edit your settings.json and add
 ### 0.2.5
 - **Word autocomplete** — as you type, suggests words already in the document. ↑/↓ to navigate, **Tab**/**Enter** to accept, **Esc** to dismiss.
 - **Source ⇄ preview toggle** — a toolbar button (`< >`) to switch between the rendered editor and the raw markdown source.
-- Removed leftover WeChat / Zhihu copy buttons and the Chinese help panel from the UI.
 
 ### 0.2.4
 - **Export to HTML and PDF** — new options in the toolbar's `⋯` menu. _Export HTML_ saves a standalone, light-themed `.html`; _Export PDF_ opens a print-ready view (choose **Save as PDF**).
