@@ -1,5 +1,6 @@
 import { t } from "./lang"
 import { confirm } from "./utils"
+import { setEditMode } from "vditor/src/ts/toolbar/EditMode"
 
 // Build a self-rendering HTML document from the current content. Mirrors
 // Vditor's own exportHTML template (diagrams re-render from the CDN), but the
@@ -89,6 +90,18 @@ export const toolbar = [
 	'undo',
 	'redo',
 	'|',
+	{
+		// One-click toggle between IR (rendered preview) and SV (markdown source).
+		name: 'source-toggle',
+		tipPosition: 's',
+		tip: 'Toggle source / preview',
+		icon: '<svg viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M8.7 15.9 4.8 12l3.9-3.9L7.3 6.7 2 12l5.3 5.3 1.4-1.4zm6.6 0 3.9-3.9-3.9-3.9 1.4-1.4L21 12l-5.3 5.3-1.4-1.4z"/></svg>',
+		click() {
+			const iv: any = (vditor as any).vditor
+			const next = iv.currentMode === 'sv' ? 'ir' : 'sv'
+			setEditMode(iv, next, vditor.getValue())
+		},
+	},
 	{ name: 'edit-mode', tipPosition: 'e', },
 	{
 		name: 'more',
@@ -230,7 +243,6 @@ export const toolbar = [
 					)
 				},
 			},
-			'help',
 		],
 	},
 ].map((it: any) => {

@@ -21,6 +21,7 @@ import { enableTableResize } from './table-resize'
 import { enableTableAddColumn } from './table-add-column'
 import { enableTableTabNewRow } from './table-tab-row'
 import { enableBpmnRender } from './bpmn'
+import { enableWordAutocomplete } from './autocomplete'
 import './main.css'
 
 function initVditor(msg) {
@@ -34,6 +35,11 @@ function initVditor(msg) {
       }
     }
   })
+  // Remove Vditor's preview action bar (WeChat 公众号 / Zhihu copy buttons and
+  // device-width toggles) — not relevant here, and forced so a previously saved
+  // non-empty value doesn't bring it back.
+  defaultOptions.preview = defaultOptions.preview || {}
+  defaultOptions.preview.actions = []
   // Apply theme from VS Code AFTER merge so it takes precedence over stored options
   if (msg.theme === 'dark') {
     defaultOptions.theme = 'dark'
@@ -67,8 +73,15 @@ function initVditor(msg) {
       fixPanelHover()
       enableTableResize()
       enableTableAddColumn()
+      enableWordAutocomplete()
       enableTableTabNewRow()
       enableBpmnRender()
+      // Re-enable native browser spell check (Vditor sets spellcheck="false" on
+      // its editable panes). Relies on the webview's Electron spellchecker.
+      const iv: any = (window as any).vditor?.vditor
+      ;[iv?.ir?.element, iv?.wysiwyg?.element, iv?.sv?.element].forEach(
+        (el: HTMLElement | undefined) => el && el.setAttribute('spellcheck', 'true')
+      )
     },
     input() {
       inputTimer && clearTimeout(inputTimer)

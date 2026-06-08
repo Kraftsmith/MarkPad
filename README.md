@@ -61,6 +61,11 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.5
+- **Word autocomplete** — as you type, suggests words already in the document. ↑/↓ to navigate, **Tab**/**Enter** to accept, **Esc** to dismiss.
+- **Source ⇄ preview toggle** — a toolbar button (`< >`) to switch between the rendered editor and the raw markdown source.
+- Removed leftover WeChat / Zhihu copy buttons and the Chinese help panel from the UI.
+
 ### 0.2.4
 - **Export to HTML and PDF** — new options in the toolbar's `⋯` menu. _Export HTML_ saves a standalone, light-themed `.html`; _Export PDF_ opens a print-ready view (choose **Save as PDF**).
 
