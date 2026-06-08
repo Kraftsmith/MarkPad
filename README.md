@@ -63,6 +63,9 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.7
+- **Right-click context menu** — switch between rendered preview and markdown source, with cut / copy / paste / select all.
+
 ### 0.2.6
 - **Word autocomplete** — as you type, suggests words already in the document. ↑/↓ to navigate, **Tab**/**Enter** to accept, **Esc** to dismiss.
 - **Source ⇄ preview toggle** — a toolbar button (`< >`) to switch between the rendered editor and the raw markdown source.

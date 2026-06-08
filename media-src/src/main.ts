@@ -22,6 +22,7 @@ import { enableTableAddColumn } from './table-add-column'
 import { enableTableTabNewRow } from './table-tab-row'
 import { enableBpmnRender } from './bpmn'
 import { enableWordAutocomplete } from './autocomplete'
+import { enableContextMenu } from './context-menu'
 import './main.css'
 
 function initVditor(msg) {
@@ -76,6 +77,7 @@ function initVditor(msg) {
       enableWordAutocomplete()
       enableTableTabNewRow()
       enableBpmnRender()
+      enableContextMenu()
       // Re-enable native browser spell check (Vditor sets spellcheck="false" on
       // its editable panes). Relies on the webview's Electron spellchecker.
       const iv: any = (window as any).vditor?.vditor

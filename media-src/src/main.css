@@ -31,6 +31,36 @@ body {
   background: var(--vscode-editorSuggestWidget-selectedBackground, #04395e);
   color: var(--vscode-editorSuggestWidget-selectedForeground, #ffffff);
 }
+/* Right-click context menu */
+.markpad-ctx {
+  position: fixed;
+  z-index: 100000;
+  min-width: 160px;
+  padding: 4px;
+  font-family: var(--vscode-font-family);
+  font-size: 13px;
+  color: var(--vscode-menu-foreground, #cccccc);
+  background: var(--vscode-menu-background, #252526);
+  border: 1px solid var(--vscode-menu-border, rgba(128, 128, 128, 0.35));
+  border-radius: 5px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+.markpad-ctx__item {
+  padding: 4px 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.markpad-ctx__item:hover {
+  background: var(--vscode-menu-selectionBackground, #04395e);
+  color: var(--vscode-menu-selectionForeground, #ffffff);
+}
+.markpad-ctx__sep {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--vscode-menu-separatorBackground, rgba(128, 128, 128, 0.3));
+}
 html,
 body,
 #app {
