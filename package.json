@@ -3,7 +3,7 @@
   "displayName": "MarkPad",
   "icon": "media/logo.png",
   "description": "A full-featured Visual markdown editor",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "publisher": "Ship-Lab",
   "author": {
     "name": "Mikhail Sarokin",
@@ -79,7 +79,7 @@
             "filenamePattern": "*.markdown"
           }
         ],
-        "priority": "default"
+        "priority": "option"
       }
     ],
     "configuration": {

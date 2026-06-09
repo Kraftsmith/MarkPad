@@ -63,6 +63,9 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.10
+- **Opens via _Open With_, not by default** — `.md` files open in the text editor again, so inline diffs (AI agents, git) stay visible. Choose _Open With… → MarkPad_ for the visual editor, or set it as your default editor manually.
+
 ### 0.2.9
 - **External edits sync live** — changes made to the file outside the editor (AI agents, formatters, git) now appear in MarkPad right away, even when it's the focused tab.
 
