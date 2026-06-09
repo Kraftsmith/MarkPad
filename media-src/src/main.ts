@@ -41,6 +41,11 @@ function initVditor(msg) {
   // non-empty value doesn't bring it back.
   defaultOptions.preview = defaultOptions.preview || {}
   defaultOptions.preview.actions = []
+  // Show line numbers in fenced code blocks.
+  defaultOptions.preview.hljs = {
+    ...(defaultOptions.preview.hljs || {}),
+    lineNumber: true,
+  }
   // Apply theme from VS Code AFTER merge so it takes precedence over stored options
   if (msg.theme === 'dark') {
     defaultOptions.theme = 'dark'

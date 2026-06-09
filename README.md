@@ -63,6 +63,10 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.8
+- **`Ctrl+F` search** — VS Code's find bar now searches text inside the editor.
+- **Code line numbers** — fenced code blocks are rendered with line numbers.
+
 ### 0.2.7
 - **Right-click context menu** — switch between rendered preview and markdown source, with cut / copy / paste / select all.
 

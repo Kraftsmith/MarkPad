@@ -102,6 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
       {
         webviewOptions: {
           retainContextWhenHidden: true,
+          enableFindWidget: true,
         },
         supportsMultipleEditorsPerDocument: false,
       }
@@ -200,6 +201,7 @@ class EditorPanel {
       localResourceRoots: [vscode.Uri.file("/"), ...this.getFolders()],
       retainContextWhenHidden: true,
       enableCommandUris: true,
+      enableFindWidget: true,
     }
   }
   private get _fsPath() {
