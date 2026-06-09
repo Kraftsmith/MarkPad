@@ -63,6 +63,9 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.9
+- **External edits sync live** — changes made to the file outside the editor (AI agents, formatters, git) now appear in MarkPad right away, even when it's the focused tab.
+
 ### 0.2.8
 - **`Ctrl+F` search** — VS Code's find bar now searches text inside the editor.
 - **Code line numbers** — fenced code blocks are rendered with line numbers.

@@ -12,6 +12,12 @@ function showError(msg: string) {
   vscode.window.showErrorMessage(`[MarkPad] ${msg}`)
 }
 
+// Compare document text ignoring line-ending differences, so we can tell the
+// webview's own edits from external ones without false mismatches.
+function sameText(a: string, b: string) {
+  return a.replace(/\r\n/g, '\n') === b.replace(/\r\n/g, '\n')
+}
+
 /**
  * Open a link clicked inside the webview. `href` is the raw markdown URL (the
  * unresolved href attribute), and `docFsPath` is the markdown file it lives in.
@@ -124,6 +130,8 @@ class EditorPanel {
   public static readonly viewType = 'markpad'
 
   private _disposables: vscode.Disposable[] = []
+  // The markdown the webview currently has — lets us skip its own edits.
+  private _lastContent = ''
 
   public static async createOrShow(
     context: vscode.ExtensionContext,
@@ -251,9 +259,9 @@ class EditorPanel {
       if (e.document.fileName !== this._document.fileName) {
         return
       }
-      // When webview panel is active, do not sync updates from VS Code editor caused by webview edits back to webview
-      // don't change webview panel when webview panel is focus
-      if (this._panel.active) {
+      // Skip changes the webview itself produced (avoids a feedback loop), but
+      // reflect external edits (agent, formatter, git) even while it's active.
+      if (sameText(e.document.getText(), this._lastContent)) {
         return
       }
       textEditTimer && clearTimeout(textEditTimer)
@@ -269,6 +277,7 @@ class EditorPanel {
 
         const syncToEditor = async () => {
           debug('sync to editor', this._document, this._uri)
+          this._lastContent = message.content
           if (this._document) {
             const edit = new vscode.WorkspaceEdit()
             edit.replace(
@@ -439,7 +448,7 @@ class EditorPanel {
     const md = this._document
       ? this._document.getText()
       : (await vscode.workspace.fs.readFile(this._uri)).toString()
-    // const dir = NodePath.dirname(this._document.fileName)
+    this._lastContent = md
     this._panel.webview.postMessage({
       command: 'update',
       content: md,
@@ -531,11 +540,16 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
     }
 
+    // Tracks the markdown the webview currently has, so its own edits (skipped —
+    // avoids loops) can be told apart from external ones (always synced).
+    let lastContent = ''
+
     // Send update to webview
     const updateWebview = (props: { type?: 'init' | 'update'; options?: any; theme?: 'dark' | 'light' } = {}) => {
+      lastContent = document.getText()
       webviewPanel.webview.postMessage({
         command: 'update',
-        content: document.getText(),
+        content: lastContent,
         ...props,
       })
     }
@@ -552,8 +566,9 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       if (e.document.fileName !== document.fileName) {
         return
       }
-      // Do not sync when webview panel is active (avoid circular updates)
-      if (webviewPanel.active) {
+      // Skip the change the webview itself produced (avoids a loop), but reflect
+      // external edits (agent, formatter, git) even while it's active.
+      if (sameText(e.document.getText(), lastContent)) {
         return
       }
       updateWebview()
@@ -565,6 +580,7 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       debug('msg from webview', message, webviewPanel.active)
 
       const syncToEditor = async () => {
+        lastContent = message.content
         const edit = new vscode.WorkspaceEdit()
         edit.replace(
           document.uri,
