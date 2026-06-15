@@ -61,6 +61,61 @@ body {
   margin: 4px 6px;
   background: var(--vscode-menu-separatorBackground, rgba(128, 128, 128, 0.3));
 }
+/* Text-to-speech control bar */
+.markpad-tts {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  font-family: var(--vscode-font-family);
+  font-size: 12px;
+  color: var(--vscode-foreground, #cccccc);
+  background: var(--vscode-editorWidget-background, #252526);
+  border: 1px solid var(--vscode-editorWidget-border, rgba(128, 128, 128, 0.35));
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+.markpad-tts__btn {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+.markpad-tts__btn:hover {
+  background: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.2));
+}
+.markpad-tts__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.85;
+}
+.markpad-tts__sel {
+  background: var(--vscode-dropdown-background, #3c3c3c);
+  color: var(--vscode-dropdown-foreground, #cccccc);
+  border: 1px solid var(--vscode-dropdown-border, rgba(128, 128, 128, 0.4));
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 12px;
+  max-width: 150px;
+}
+.markpad-tts__close {
+  margin-left: 2px;
+  opacity: 0.7;
+}
+/* Word currently being read aloud (CSS Custom Highlight API) */
+::highlight(markpad-tts-word) {
+  background-color: rgba(255, 209, 0, 0.45);
+  color: inherit;
+}
 html,
 body,
 #app {

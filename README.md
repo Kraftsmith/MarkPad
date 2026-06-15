@@ -63,6 +63,10 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.11
+- **Read aloud** — text-to-speech from the right-click menu, with a control bar (play/pause, stop, language, voice, speed) and **read-along word highlighting**.
+- **Bring to Claude** — copy the selection and jump to Claude Code's input (right-click or `Ctrl+Alt+C`), then paste.
+
 ### 0.2.10
 - **Opens via _Open With_, not by default** — `.md` files open in the text editor again, so inline diffs (AI agents, git) stay visible. Choose _Open With… → MarkPad_ for the visual editor, or set it as your default editor manually.
 

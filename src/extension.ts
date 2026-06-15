@@ -371,6 +371,14 @@ class EditorPanel {
             openLink(message.href, this._fsPath)
             break
           }
+          case 'bring-to-claude': {
+            // Selection is already on the clipboard; focus Claude Code's input
+            // so the user can paste. Best-effort (Claude Code may not be installed).
+            try {
+              await vscode.commands.executeCommand('claude-vscode.focus')
+            } catch { }
+            break
+          }
           case 'export': {
             await handleExport(message, this._fsPath)
             break
@@ -652,6 +660,12 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
         case 'open-link': {
           openLink(message.href, uri.fsPath)
+          break
+        }
+        case 'bring-to-claude': {
+          try {
+            await vscode.commands.executeCommand('claude-vscode.focus')
+          } catch { }
           break
         }
         case 'export': {

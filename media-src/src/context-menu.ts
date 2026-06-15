@@ -8,6 +8,7 @@
  * (best effort — Ctrl+V always works through Vditor's own handler).
  */
 import { setEditMode } from 'vditor/src/ts/toolbar/EditMode'
+import { readAloud, ttsAvailable } from './tts'
 
 const MENU_CLASS = 'markpad-ctx'
 let menu: HTMLElement | null = null
@@ -32,13 +33,39 @@ async function paste() {
   }
 }
 
+// "Bring to Claude": copy the selection and focus Claude Code's input. There's
+// no API to inject text into Claude's chat, so we copy + focus its input and the
+// user finishes with a single paste.
+function bringToClaude() {
+  const text = (window.getSelection()?.toString() || '')
+    .replace(/ /g, ' ')
+    .trim()
+  if (!text) return
+  navigator.clipboard.writeText(text).catch(() => {})
+  ;(window as any).vscode?.postMessage?.({ command: 'bring-to-claude' })
+  try {
+    ;(window as any).vditor?.tip?.show?.('Copied — now paste into Claude (Ctrl+V)', 2000)
+  } catch {
+    /* tip is best-effort */
+  }
+}
+
 type Item = { label: string; run: () => void } | 'sep'
 
 function items(): Item[] {
   const v: any = (window as any).vditor
   const iv = v?.vditor
   const inSource = iv?.currentMode === 'sv'
-  return [
+  const hasSelection = !!(window.getSelection()?.toString() || '').trim()
+
+  const list: Item[] = []
+  if (ttsAvailable()) {
+    list.push({ label: 'Read aloud', run: readAloud }, 'sep')
+  }
+  if (hasSelection) {
+    list.push({ label: 'Bring to Claude  (Ctrl+Alt+C)', run: bringToClaude }, 'sep')
+  }
+  list.push(
     inSource
       ? { label: 'Switch to preview', run: () => setEditMode(iv, 'ir', v.getValue()) }
       : { label: 'Switch to source', run: () => setEditMode(iv, 'sv', v.getValue()) },
@@ -46,8 +73,9 @@ function items(): Item[] {
     { label: 'Cut', run: () => document.execCommand('cut') },
     { label: 'Copy', run: () => document.execCommand('copy') },
     { label: 'Paste', run: paste },
-    { label: 'Select all', run: () => document.execCommand('selectAll') },
-  ]
+    { label: 'Select all', run: () => document.execCommand('selectAll') }
+  )
+  return list
 }
 
 function show(x: number, y: number) {
@@ -91,6 +119,18 @@ export function enableContextMenu() {
       e.stopPropagation()
       show(e.clientX, e.clientY)
     })
+    // Ctrl+Alt+C → copy selection for Claude (KeyC is layout-independent).
+    el.addEventListener(
+      'keydown',
+      (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.altKey && !e.shiftKey && e.code === 'KeyC') {
+          e.preventDefault()
+          e.stopImmediatePropagation()
+          bringToClaude()
+        }
+      },
+      true
+    )
   })
 
   document.addEventListener(
