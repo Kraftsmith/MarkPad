@@ -63,6 +63,9 @@ Edit your settings.json and add
 
 ## Release Notes
 
+### 0.2.12
+- **Open in text editor** — the `< >` toolbar button and the right-click "Open in text editor" now reopen the file in VS Code's native editor, instead of an in-editor split view.
+
 ### 0.2.11
 - **Read aloud** — text-to-speech from the right-click menu, with a control bar (play/pause, stop, language, voice, speed) and **read-along word highlighting**.
 - **Bring to Claude** — copy the selection and jump to Claude Code's input (right-click or `Ctrl+Alt+C`), then paste.

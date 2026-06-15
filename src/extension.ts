@@ -379,6 +379,13 @@ class EditorPanel {
             } catch { }
             break
           }
+          case 'open-source': {
+            // Reopen the file in VS Code's native text editor (the default .md editor).
+            try {
+              await vscode.commands.executeCommand('vscode.openWith', this._uri, 'default')
+            } catch { }
+            break
+          }
           case 'export': {
             await handleExport(message, this._fsPath)
             break
@@ -665,6 +672,12 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         case 'bring-to-claude': {
           try {
             await vscode.commands.executeCommand('claude-vscode.focus')
+          } catch { }
+          break
+        }
+        case 'open-source': {
+          try {
+            await vscode.commands.executeCommand('vscode.openWith', uri, 'default')
           } catch { }
           break
         }

@@ -7,7 +7,6 @@
  * Cut/Copy/Select all use execCommand; Paste tries the async clipboard API
  * (best effort — Ctrl+V always works through Vditor's own handler).
  */
-import { setEditMode } from 'vditor/src/ts/toolbar/EditMode'
 import { readAloud, ttsAvailable } from './tts'
 
 const MENU_CLASS = 'markpad-ctx'
@@ -53,9 +52,6 @@ function bringToClaude() {
 type Item = { label: string; run: () => void } | 'sep'
 
 function items(): Item[] {
-  const v: any = (window as any).vditor
-  const iv = v?.vditor
-  const inSource = iv?.currentMode === 'sv'
   const hasSelection = !!(window.getSelection()?.toString() || '').trim()
 
   const list: Item[] = []
@@ -66,9 +62,10 @@ function items(): Item[] {
     list.push({ label: 'Bring to Claude  (Ctrl+Alt+C)', run: bringToClaude }, 'sep')
   }
   list.push(
-    inSource
-      ? { label: 'Switch to preview', run: () => setEditMode(iv, 'ir', v.getValue()) }
-      : { label: 'Switch to source', run: () => setEditMode(iv, 'sv', v.getValue()) },
+    {
+      label: 'Open in text editor',
+      run: () => (window as any).vscode?.postMessage?.({ command: 'open-source' }),
+    },
     'sep',
     { label: 'Cut', run: () => document.execCommand('cut') },
     { label: 'Copy', run: () => document.execCommand('copy') },
