@@ -6,11 +6,14 @@
 
 - **True WYSIWYG editing** with three modes — instant-rendering (default), full WYSIWYG, and split-screen preview.
 - **Live two-way sync** with VS Code's native editor: edits on either side stay in sync, and saving writes straight back to the file.
+- **Document variables** — define reusable values (e.g. `productName`, `version`) in a `vars:` frontmatter block or the **Variables panel**, reference them inline as `{{name}}`, and the editor renders the value. Change a value once and every reference updates; the file keeps the `{{name}}` references, so it stays parameterized. Type `{{` to insert one from a dropdown.
 - **Opens like a built-in editor** — via the Command Palette, a keybinding (`Ctrl/Cmd+Shift+Alt+M`), the Explorer or editor-tab context menu, or _Open With…_; can be set as the default editor for `.md` files.
 - **Theme-aware** — automatically matches your active VS Code color theme.
 - **Copy as Markdown or HTML** straight from the toolbar.
 - **Smart image handling** — paste, drag-and-drop, or upload images and have them auto-saved to a configurable assets folder.
 - **Word autocomplete** — as you type, suggests words already in the document. ↑/↓ to navigate, **Tab**/**Enter** to accept, **Esc** to dismiss.
+- **Read aloud (text-to-speech)** — from the right-click menu, with a control bar (play/pause, stop, language, voice, speed) and read-along word highlighting.
+- **Emoji** — pick from the full emoji set in the toolbar, or type `:name` to autocomplete.
 - **Source ⇄ preview toggle** — a toolbar button (`< >`) to switch between the rendered editor and the raw markdown source.
 - **Diagrams, charts & math** — render fenced code blocks with Mermaid, Apache ECharts, Graphviz, PlantUML, flowchart.js, abc.js (music notation), SMILES (chemical structures), and ECharts-powered mind maps, plus KaTeX / MathJax math.
 - **BPMN diagrams** — render `bpmn` fenced blocks (BPMN 2.0 XML) as process diagrams, including colored pools, lanes and elements via _BPMN in Color_.
@@ -62,6 +65,14 @@ Edit your settings.json and add
 ```
 
 ## Release Notes
+
+### 0.3.0
+- **Document variables** — define reusable values once and use them throughout a document:
+  - Define `name: value` pairs in a `vars:` YAML frontmatter block, or manage them from the new **Variables** toolbar panel (`{x}`).
+  - Reference a variable inline as `{{name}}`; the editor renders its current value as a chip, while the file keeps the literal `{{name}}` so the document stays parameterized and portable.
+  - Change a value once and **every** reference updates instantly.
+  - Type `{{` to insert a variable from a dropdown of those defined.
+  - Undefined references are flagged; references inside code blocks are left literal.
 
 ### 0.2.12
 - **Open in text editor** — the `< >` toolbar button and the right-click "Open in text editor" now reopen the file in VS Code's native editor, instead of an in-editor split view.

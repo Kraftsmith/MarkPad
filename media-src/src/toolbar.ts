@@ -1,5 +1,6 @@
 import { t } from "./lang"
 import { confirm } from "./utils"
+import { readMarkdown, toggleVariablesPanel } from "./variables"
 
 // Build a self-rendering HTML document from the current content. Mirrors
 // Vditor's own exportHTML template (diagrams re-render from the CDN), but the
@@ -58,7 +59,7 @@ export const toolbar = [
 		click() {
 			vscode.postMessage({
 				command: 'save',
-				content: vditor.getValue(),
+				content: readMarkdown(),
 			})
 		},
 	},
@@ -90,6 +91,16 @@ export const toolbar = [
 	'redo',
 	'|',
 	{
+		// Open the Variables panel (define/edit document variables used as {{name}}).
+		name: 'variables',
+		tipPosition: 's',
+		tip: 'Variables',
+		icon: '<svg viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7 4c-1.66 0-3 1.34-3 3v2.2c0 .6-.4 1.05-1 1.05H2.5v2.5H3c.6 0 1 .45 1 1.05V17c0 1.66 1.34 3 3 3h1v-2H7c-.55 0-1-.45-1-1v-2.2c0-1.02-.5-1.86-1.3-2.3.8-.44 1.3-1.28 1.3-2.3V7c0-.55.45-1 1-1h1V4H7zm10 0h-1v2h1c.55 0 1 .45 1 1v2.2c0 1.02.5 1.86 1.3 2.3-.8.44-1.3 1.28-1.3 2.3V17c0 .55-.45 1-1 1h-1v2h1c1.66 0 3-1.34 3-3v-2.2c0-.6.4-1.05 1-1.05h.5v-2.5H21c-.6 0-1-.45-1-1.05V7c0-1.66-1.34-3-3-3z"/></svg>',
+		click() {
+			toggleVariablesPanel()
+		},
+	},
+	{
 		// Open the file in VS Code's native text editor (raw markdown source).
 		name: 'source-toggle',
 		tipPosition: 's',
@@ -114,7 +125,7 @@ export const toolbar = [
 				icon: t('copyMarkdown'),
 				async click() {
 					try {
-						await navigator.clipboard.writeText(vditor.getValue())
+						await navigator.clipboard.writeText(readMarkdown())
 						vscode.postMessage({
 							command: 'info',
 							content: 'Copy Markdown successfully!',

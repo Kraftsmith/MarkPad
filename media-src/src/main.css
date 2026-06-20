@@ -4,6 +4,159 @@ body {
   margin: 0;
   padding: 0;
 }
+/* Keep the (now full) emoji panel scrollable instead of growing unbounded */
+.vditor-emojis {
+  max-height: 320px !important;
+  overflow-y: auto;
+}
+/* Document variables — inline reference chips.
+   The chip's real text is the literal {{name}} (kept in .markpad-var__raw, hidden)
+   so markdown round-trips; the value shows via ::before from data-value. */
+.markpad-var {
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+}
+.markpad-var__raw {
+  display: none;
+}
+.markpad-var::before {
+  content: attr(data-value);
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--vscode-badge-background, rgba(110, 118, 129, 0.25));
+  color: var(--vscode-badge-foreground, inherit);
+  font-size: 0.95em;
+}
+.markpad-var--undef {
+  user-select: text;
+  color: var(--vscode-errorForeground, #d33);
+  border-bottom: 1px dashed var(--vscode-errorForeground, #d33);
+}
+.markpad-var--undef .markpad-var__raw {
+  display: inline;
+}
+.markpad-var--undef::before {
+  content: none;
+}
+/* `{{` insertion hint — dimmed value preview, right-aligned, in Vditor's hint panel */
+.markpad-hint__val {
+  float: right;
+  margin-left: 16px;
+  opacity: 0.55;
+  font-size: 0.92em;
+}
+/* Variables management panel */
+.markpad-vars {
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  z-index: 100000;
+  width: 320px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  font-family: var(--vscode-font-family);
+  font-size: 12px;
+  color: var(--vscode-foreground, #cccccc);
+  background: var(--vscode-editorWidget-background, #252526);
+  border: 1px solid var(--vscode-editorWidget-border, rgba(128, 128, 128, 0.35));
+  border-radius: 6px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+}
+.markpad-vars__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.markpad-vars__title {
+  font-weight: 600;
+}
+.markpad-vars__close {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+.markpad-vars__close:hover {
+  background: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.2));
+  opacity: 1;
+}
+.markpad-vars__list {
+  overflow-y: auto;
+  margin-bottom: 6px;
+}
+.markpad-vars__empty {
+  opacity: 0.6;
+  padding: 6px 2px;
+}
+.markpad-vars__row,
+.markpad-vars__add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.markpad-vars__label {
+  flex: 0 0 38%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--vscode-editor-font-family), monospace;
+}
+.markpad-vars__rowval,
+.markpad-vars__name,
+.markpad-vars__val {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, #cccccc);
+  border: 1px solid var(--vscode-input-border, rgba(128, 128, 128, 0.4));
+  border-radius: 4px;
+  padding: 3px 5px;
+  font-size: 12px;
+}
+.markpad-vars__name {
+  flex: 0 0 38%;
+  font-family: var(--vscode-editor-font-family), monospace;
+}
+.markpad-vars__del,
+.markpad-vars__addbtn {
+  flex: 0 0 auto;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 4px;
+  opacity: 0.75;
+}
+.markpad-vars__del:hover,
+.markpad-vars__addbtn:hover {
+  background: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.2));
+  opacity: 1;
+}
+.markpad-vars__add {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--vscode-editorWidget-border, rgba(128, 128, 128, 0.25));
+}
+.markpad-vars__hint {
+  opacity: 0.6;
+  margin-top: 4px;
+}
+.markpad-vars__hint code {
+  font-family: var(--vscode-editor-font-family), monospace;
+}
 /* Word autocomplete popup */
 .markpad-ac {
   position: fixed;
