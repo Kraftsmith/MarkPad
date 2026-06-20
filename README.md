@@ -20,6 +20,10 @@
 - **Extended Markdown** — tables, task lists, footnotes, and syntax-highlighted code blocks.
 - **Personalizable** — apply your own styling with `markpad.customCss`.
 
+## Documentation
+
+📖 **[User Manual](docs/user-manual.md)** — a complete guide to every feature.
+
 ## Install
 
 [https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad](https://marketplace.visualstudio.com/items?itemName=Ship-Lab.markpad)
