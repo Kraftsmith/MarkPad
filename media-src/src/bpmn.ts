@@ -146,50 +146,83 @@ function renderInto(container: HTMLElement, xml: string, hash: string) {
   }
 }
 
+function preserveIrSelection(fn: () => void) {
+  const editor = (window as any).vditor?.vditor
+  const editable = editor?.currentMode === 'ir' ? editor.ir?.element : null
+  const sel = window.getSelection()
+  const before =
+    editable && sel?.rangeCount && editable.contains(sel.anchorNode)
+      ? sel.getRangeAt(0).cloneRange()
+      : null
+
+  if (before && editor?.ir) editor.ir.range = before.cloneRange()
+  fn()
+  if (!before || !editable?.isConnected) return
+
+  const after = window.getSelection()
+  const stillInside =
+    after && after.rangeCount > 0 && editable.contains(after.anchorNode)
+  if (stillInside) {
+    if (editor?.ir) editor.ir.range = after.getRangeAt(0).cloneRange()
+    return
+  }
+
+  try {
+    const current = window.getSelection()
+    current?.removeAllRanges()
+    current?.addRange(before)
+    if (editor?.ir) editor.ir.range = before.cloneRange()
+  } catch {
+    /* The original selection node was replaced by Vditor; leave Vditor's saved range as-is. */
+  }
+}
+
 function refresh(root: HTMLElement) {
-  const live = new Set<HTMLElement>()
+  preserveIrSelection(() => {
+    const live = new Set<HTMLElement>()
 
-  // Vditor renders each code block's output into `pre.vditor-ir__preview`
-  // (shown when the block isn't focused). For a `bpmn` block we render the
-  // diagram into that preview; the raw XML there is hidden via CSS, and Vditor
-  // reveals the editable source only while the block is being edited.
-  root
-    .querySelectorAll<HTMLElement>('pre.vditor-ir__preview')
-    .forEach((preview) => {
-      const code = preview.querySelector<HTMLElement>(
-        'code[class~="language-bpmn"]'
-      )
-      if (!code) return
-      const xml = (code.textContent || '').trim()
+    // Vditor renders each code block's output into `pre.vditor-ir__preview`
+    // (shown when the block isn't focused). For a `bpmn` block we render the
+    // diagram into that preview; the raw XML there is hidden via CSS, and Vditor
+    // reveals the editable source only while the block is being edited.
+    root
+      .querySelectorAll<HTMLElement>('pre.vditor-ir__preview')
+      .forEach((preview) => {
+        const code = preview.querySelector<HTMLElement>(
+          'code[class~="language-bpmn"]'
+        )
+        if (!code) return
+        const xml = (code.textContent || '').trim()
 
-      let container = preview.querySelector<HTMLElement>(
-        ':scope > .' + CONTAINER_CLASS
-      )
-      if (!container) {
-        container = document.createElement('div')
-        container.className = CONTAINER_CLASS
-        container.contentEditable = 'false'
-        preview.appendChild(container)
-      }
-      live.add(container)
+        let container = preview.querySelector<HTMLElement>(
+          ':scope > .' + CONTAINER_CLASS
+        )
+        if (!container) {
+          container = document.createElement('div')
+          container.className = CONTAINER_CLASS
+          container.contentEditable = 'false'
+          preview.appendChild(container)
+        }
+        live.add(container)
 
-      const hash = hashXml(xml)
-      if (container.getAttribute(HASH_ATTR) !== hash) {
-        container.setAttribute(HASH_ATTR, hash)
-        renderInto(container, xml, hash)
-      }
-    })
+        const hash = hashXml(xml)
+        if (container.getAttribute(HASH_ATTR) !== hash) {
+          container.setAttribute(HASH_ATTR, hash)
+          renderInto(container, xml, hash)
+        }
+      })
 
-  // Drop diagrams whose source block was removed.
-  root
-    .querySelectorAll<HTMLElement>('.' + CONTAINER_CLASS)
-    .forEach((c) => {
-      if (!live.has(c)) c.remove()
-    })
+    // Drop diagrams whose source block was removed.
+    root
+      .querySelectorAll<HTMLElement>('.' + CONTAINER_CLASS)
+      .forEach((c) => {
+        if (!live.has(c)) c.remove()
+      })
+  })
 }
 
 export function enableBpmnRender() {
-  const root = (window as any).vditor?.vditor?.element as HTMLElement | undefined
+  const root = (window as any).vditor?.vditor?.ir?.element as HTMLElement | undefined
   if (!root) return
 
   let timer: ReturnType<typeof setTimeout> | undefined

@@ -123,22 +123,55 @@ function startDrag(e: MouseEvent) {
   document.addEventListener('mouseup', onUp, true)
 }
 
+function preserveIrSelection(fn: () => void) {
+  const editor = (window as any).vditor?.vditor
+  const editable = editor?.currentMode === 'ir' ? editor.ir?.element : null
+  const sel = window.getSelection()
+  const before =
+    editable && sel?.rangeCount && editable.contains(sel.anchorNode)
+      ? sel.getRangeAt(0).cloneRange()
+      : null
+
+  if (before && editor?.ir) editor.ir.range = before.cloneRange()
+  fn()
+  if (!before || !editable?.isConnected) return
+
+  const after = window.getSelection()
+  const stillInside =
+    after && after.rangeCount > 0 && editable.contains(after.anchorNode)
+  if (stillInside) {
+    if (editor?.ir) editor.ir.range = after.getRangeAt(0).cloneRange()
+    return
+  }
+
+  try {
+    const current = window.getSelection()
+    current?.removeAllRanges()
+    current?.addRange(before)
+    if (editor?.ir) editor.ir.range = before.cloneRange()
+  } catch {
+    /* The original selection was replaced by Vditor; keep the saved range. */
+  }
+}
+
 function refreshTables(root: HTMLElement) {
-  const tables = root.querySelectorAll('table')
-  tables.forEach((t) => {
-    const table = t as HTMLTableElement
-    const stored = recallWidths(table)
-    if (stored && stored.length) {
-      ensureColgroup(table, stored)
-      // Re-bind in WeakMap in case this is a freshly rendered table element.
-      widthsByTable.set(table, stored.slice())
-    }
-    attachHandles(table)
+  preserveIrSelection(() => {
+    const tables = root.querySelectorAll('table')
+    tables.forEach((t) => {
+      const table = t as HTMLTableElement
+      const stored = recallWidths(table)
+      if (stored && stored.length) {
+        ensureColgroup(table, stored)
+        // Re-bind in WeakMap in case this is a freshly rendered table element.
+        widthsByTable.set(table, stored.slice())
+      }
+      attachHandles(table)
+    })
   })
 }
 
 export function enableTableResize() {
-  const root = (window as any).vditor?.vditor?.element as HTMLElement | undefined
+  const root = (window as any).vditor?.vditor?.ir?.element as HTMLElement | undefined
   if (!root) return
 
   // Capture-phase to win over Vditor's own mousedown handlers.

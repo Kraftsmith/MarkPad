@@ -372,8 +372,23 @@ body[data-use-vscode-theme-color="1"] .vditor {
   text-transform: none!important;
 }
 
+/* Size tables to their content instead of stretching to the editor width.
+   Vditor defaults tables to `display: block` (which fills the container and adds a
+   horizontal scrollbar); `display: table` + `width: auto` shrinks the table to fit
+   its columns. `max-width: 100%` caps the table at the editor width — past that,
+   cells wrap (overriding Vditor's `white-space: nowrap`) instead of overflowing
+   into a horizontal scrollbar. */
 .vditor-reset table {
+  display: table !important;
   width: auto !important;
+  max-width: 100% !important;
+}
+.vditor-reset table td,
+.vditor-reset table th {
+  white-space: normal !important;
+  /* Lets unbreakable tokens (long identifiers, URLs) split so the table can
+     actually shrink to the max-width cap. */
+  overflow-wrap: anywhere;
 }
 
 /* Column resize handles */
@@ -393,9 +408,14 @@ body[data-use-vscode-theme-color="1"] .vditor {
   background: transparent;
   transition: background 0.15s ease-in-out;
 }
+/* Faint hint whenever the cursor is anywhere over the table, so the handles
+   are discoverable; full highlight when grabbing one. */
+.vditor-reset table:hover .msmd-table-col-resize {
+  background: rgba(33, 150, 243, 0.22);
+}
 .msmd-table-col-resize:hover,
 .msmd-table-col-resize.active {
-  background: rgba(33, 150, 243, 0.5);
+  background: rgba(33, 150, 243, 0.6);
 }
 
 /* "Add column" button — floats at a table's right edge on hover */
