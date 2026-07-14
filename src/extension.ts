@@ -108,7 +108,10 @@ export function activate(context: vscode.ExtensionContext) {
       {
         webviewOptions: {
           retainContextWhenHidden: true,
-          enableFindWidget: true,
+          // MarkPad provides its own Ctrl+F find (see media-src/src/find.ts).
+          // VS Code's native webview find widget is unreliable over Vditor's
+          // contenteditable surface, so it's disabled to avoid two find UIs.
+          enableFindWidget: false,
         },
         supportsMultipleEditorsPerDocument: false,
       }
@@ -209,7 +212,9 @@ class EditorPanel {
       localResourceRoots: [vscode.Uri.file("/"), ...this.getFolders()],
       retainContextWhenHidden: true,
       enableCommandUris: true,
-      enableFindWidget: true,
+      // MarkPad provides its own Ctrl+F find (see media-src/src/find.ts); the
+      // native webview widget is unreliable over Vditor's contenteditable.
+      enableFindWidget: false,
     }
   }
   private get _fsPath() {

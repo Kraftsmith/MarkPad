@@ -554,6 +554,58 @@ export function readMarkdown(): string {
   return injectVars(serializeBody(), varsMap)
 }
 
+// Count GFM table blocks (a header line immediately followed by a delimiter
+// row), ignoring fenced code so pipe-art inside code isn't miscounted.
+function countMarkdownTables(md: string): number {
+  const noFences = md
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/~~~[\s\S]*?~~~/g, '')
+  const lines = noFences.split('\n')
+  let n = 0
+  for (let i = 1; i < lines.length; i++) {
+    if (
+      /^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)+\|?\s*$/.test(lines[i]) &&
+      lines[i - 1].indexOf('|') !== -1
+    ) {
+      n++
+    }
+  }
+  return n
+}
+
+// Guard for persistence. On every keystroke MarkPad re-serializes the whole IR
+// DOM through Lute and overwrites the file. If that serialize lands while an
+// async DOM mutation (chip re-apply, colgroup inject, Vditor block re-render)
+// has a table momentarily malformed, Lute can drop the entire table — silently
+// corrupting a region the user never touched. We can't win the race, so we
+// refuse to persist a serialization that lost a table versus the live DOM and
+// let the caller retry once the DOM settles. After a few consecutive misses we
+// give up and persist anyway, so a genuine (non-transient) mismatch — e.g. a DOM
+// table Lute legitimately doesn't emit as GFM — can't wedge saving forever.
+let lossyStreak = 0
+export function readMarkdownForSave(): string | null {
+  const md = readMarkdown()
+  const editable = activeEditable()
+  if (!editable) {
+    lossyStreak = 0
+    return md
+  }
+  const domTables = editable.querySelectorAll('table').length
+  const mdTables = countMarkdownTables(md)
+  if (domTables > 0 && mdTables < domTables) {
+    lossyStreak++
+    console.warn(
+      `[MarkPad] Skipped save: serialize dropped a table (DOM ${domTables} > markdown ${mdTables}); retry #${lossyStreak}`
+    )
+    if (lossyStreak < 4) return null
+    console.warn(
+      '[MarkPad] Persisting despite table-count mismatch after repeated retries'
+    )
+  }
+  lossyStreak = 0
+  return md
+}
+
 // Parse `vars:` off a document, store them, and return the body to feed Vditor.
 export function loadVars(md: string): string {
   const { vars, body } = splitVars(md)
@@ -562,10 +614,13 @@ export function loadVars(md: string): string {
 }
 
 function persistNow() {
-  ;(window as any).vscode?.postMessage({
-    command: 'edit',
-    content: readMarkdown(),
-  })
+  const content = readMarkdownForSave()
+  if (content === null) {
+    // A transient malformed DOM dropped a table; retry once it settles.
+    schedulePersist()
+    return
+  }
+  ;(window as any).vscode?.postMessage({ command: 'edit', content })
 }
 let persistTimer: ReturnType<typeof setTimeout> | undefined
 function schedulePersist() {

@@ -23,8 +23,9 @@ import { enableTableTabNewRow } from './table-tab-row'
 import { enableBpmnRender } from './bpmn'
 import { enableWordAutocomplete } from './autocomplete'
 import { enableContextMenu } from './context-menu'
+import { enableFind } from './find'
 import { enableRichEmoji } from './emoji'
-import { enableVariables, loadVars, readMarkdown, refreshVariables } from './variables'
+import { enableVariables, loadVars, readMarkdown, readMarkdownForSave, refreshVariables } from './variables'
 import './main.css'
 
 let lastPostedMarkdown = ''
@@ -90,6 +91,7 @@ function initVditor(msg) {
       enableContextMenu()
       enableRichEmoji()
       enableVariables()
+      enableFind()
       // Re-enable native browser spell check (Vditor sets spellcheck="false" on
       // its editable panes). Relies on the webview's Electron spellchecker.
       const iv: any = (window as any).vditor?.vditor
@@ -99,8 +101,15 @@ function initVditor(msg) {
     },
     input() {
       inputTimer && clearTimeout(inputTimer)
-      inputTimer = setTimeout(() => {
-        const content = readMarkdown()
+      inputTimer = setTimeout(function persist() {
+        const content = readMarkdownForSave()
+        if (content === null) {
+          // Serialize dropped a table mid-edit (transient malformed DOM). Retry
+          // once it settles so this keystroke still saves — from a clean pass.
+          inputTimer && clearTimeout(inputTimer)
+          inputTimer = setTimeout(persist, 200)
+          return
+        }
         lastPostedMarkdown = content
         vscode.postMessage({ command: 'edit', content })
       }, 100)
