@@ -23,10 +23,21 @@ import { enableTableTabNewRow } from './table-tab-row'
 import { enableBpmnRender } from './bpmn'
 import { enableWordAutocomplete } from './autocomplete'
 import { enableContextMenu } from './context-menu'
-import { enableFind } from './find'
+import { enableFind, openFind } from './find'
+import { openGeminiComment } from './gemini-comment'
 import { enableRichEmoji } from './emoji'
 import { enableVariables, loadVars, readMarkdown, readMarkdownForSave, refreshVariables } from './variables'
+import { enableBrBreaks, refreshBrBreaks } from './br-breaks'
+import { repairTableCellNewlines } from './fix-table-newlines'
+import { fixTableCellSpace } from './fix-table-cell-space'
+import { fixMermaid } from './fix-mermaid'
 import './main.css'
+
+// Must run before the first `new Vditor(...)`: it patches Lute as the CDN script
+// assigns the global, and the document's first render happens inside the Vditor
+// constructor. See fix-table-cell-space.ts.
+fixTableCellSpace()
+fixMermaid()
 
 let lastPostedMarkdown = ''
 
@@ -70,8 +81,10 @@ function initVditor(msg) {
     height: '100%',
     minHeight: '100%',
     lang,
-    // Parse `vars:` frontmatter out of the editing surface; it's re-injected on save.
-    value: loadVars(msg.content),
+    // Parse `vars:` frontmatter out of the editing surface; it's re-injected on
+    // save. Repair table cells that contain a literal newline (invalid GFM that
+    // Lute splits into broken rows) by stitching them back with `<br>`.
+    value: repairTableCellNewlines(loadVars(msg.content)),
     mode: 'ir',
     cache: { enable: false },
     cdn: 'https://cdn.jsdelivr.net/npm/vditor@3.11.2',
@@ -91,6 +104,7 @@ function initVditor(msg) {
       enableContextMenu()
       enableRichEmoji()
       enableVariables()
+      enableBrBreaks()
       enableFind()
       // Re-enable native browser spell check (Vditor sets spellcheck="false" on
       // its editable panes). Relies on the webview's Electron spellchecker.
@@ -169,8 +183,9 @@ window.addEventListener('message', (e) => {
           break
         }
         // External edit: strip `vars:` back out, refresh the value store, re-chip.
-        vditor.setValue(loadVars(msg.content))
+        vditor.setValue(repairTableCellNewlines(loadVars(msg.content)))
         refreshVariables()
+        refreshBrBreaks()
         console.log('setValue')
       }
       break
@@ -192,6 +207,14 @@ window.addEventListener('message', (e) => {
           }
         }
       })
+      break
+    }
+    case 'find': {
+      openFind()
+      break
+    }
+    case 'comment-gemini': {
+      openGeminiComment()
       break
     }
     default:

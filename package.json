@@ -3,7 +3,7 @@
   "displayName": "MarkPad",
   "icon": "media/logo.png",
   "description": "A full-featured Visual markdown editor",
-  "version": "0.3.4",
+  "version": "0.3.12",
   "publisher": "Ship-Lab",
   "author": {
     "name": "Mikhail Sarokin",
@@ -27,7 +27,6 @@
   ],
   "activationEvents": [
     "onCommand:markpad.openEditor",
-    "onWebviewPanel:markpad",
     "onLanguage:markdown",
     "onCustomEditor:markpad.customEditor"
   ],
@@ -41,6 +40,16 @@
       {
         "command": "markpad.openEditor",
         "title": "Open with MarkPad",
+        "category": "MarkPad"
+      },
+      {
+        "command": "markpad.find",
+        "title": "Find",
+        "category": "MarkPad"
+      },
+      {
+        "command": "markpad.commentGemini",
+        "title": "Comment with Gemini",
         "category": "MarkPad"
       }
     ],
@@ -107,6 +116,18 @@
         "command": "markpad.openEditor",
         "mac": "cmd+shift+alt+m",
         "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "key": "ctrl+f",
+        "command": "markpad.find",
+        "mac": "cmd+f",
+        "when": "activeCustomEditorId == 'markpad.customEditor'"
+      },
+      {
+        "key": "ctrl+alt+i",
+        "command": "markpad.commentGemini",
+        "mac": "cmd+alt+i",
+        "when": "activeCustomEditorId == 'markpad.customEditor'"
       }
     ]
   },

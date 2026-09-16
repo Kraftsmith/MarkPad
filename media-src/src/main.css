@@ -372,23 +372,36 @@ body[data-use-vscode-theme-color="1"] .vditor {
   text-transform: none!important;
 }
 
-/* Size tables to their content instead of stretching to the editor width.
-   Vditor defaults tables to `display: block` (which fills the container and adds a
-   horizontal scrollbar); `display: table` + `width: auto` shrinks the table to fit
-   its columns. `max-width: 100%` caps the table at the editor width — past that,
-   cells wrap (overriding Vditor's `white-space: nowrap`) instead of overflowing
-   into a horizontal scrollbar. */
+/* Stretch tables to the full editor width. Vditor defaults tables to
+   `display: block`, which fills the container but adds a horizontal scrollbar
+   whenever the content is wider; `display: table` + `width: 100%` fills the same
+   width while letting the auto table layout divide it between the columns.
+   `max-width: 100%` keeps the table from overflowing — past that, cells wrap
+   (overriding Vditor's `white-space: nowrap`) instead of scrolling sideways. */
 .vditor-reset table {
   display: table !important;
-  width: auto !important;
+  width: 100% !important;
   max-width: 100% !important;
 }
 .vditor-reset table td,
 .vditor-reset table th {
   white-space: normal !important;
-  /* Lets unbreakable tokens (long identifiers, URLs) split so the table can
-     actually shrink to the max-width cap. */
-  overflow-wrap: anywhere;
+  /* Lets unbreakable tokens (long identifiers, URLs) split rather than force the
+     table wider than the editor. `break-word` rather than `anywhere` on purpose:
+     `anywhere` also drops each column's min-content width to a single character,
+     so the auto layout squeezes short columns down to one letter per line to hand
+     the space to a long one. */
+  overflow-wrap: break-word;
+}
+
+/* Render `<br>` as a real line break in the IR editor. Lute renders inline `<br>`
+   (the only way to break a line inside a table cell) as a hidden marker node with
+   no visible break; br-breaks.ts tags those nodes `.markpad-br` and this draws the
+   break. `content: "\A"` + `white-space: pre` is a self-contained newline that the
+   cell's `white-space: normal` can't collapse. */
+.markpad-br::after {
+  content: "\A";
+  white-space: pre;
 }
 
 /* Column resize handles */
@@ -521,4 +534,127 @@ body[data-use-vscode-theme-color="1"] .vditor {
 }
 .markpad-find__btn:hover {
   background: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.31));
+}
+
+/* ====================================================================
+   Inline Gemini Comment Popover
+   ==================================================================== */
+.markpad-gemini-comment {
+  position: fixed;
+  display: none;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  background: var(--vscode-editorWidget-background, #252526);
+  color: var(--vscode-editorWidget-foreground, #cccccc);
+  border: 1px solid var(--vscode-editorWidget-border, #454545);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.36);
+  border-radius: 6px;
+  padding: 10px 12px;
+  z-index: 1000;
+  z-index: 100000;
+  box-sizing: border-box;
+  font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+  font-size: 12px;
+}
+.markpad-gemini-comment--visible {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: markpad-fade-in 0.12s ease-out;
+}
+@keyframes markpad-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.markpad-gemini-comment__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.markpad-gemini-comment__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--vscode-foreground, #cccccc);
+}
+.markpad-gemini-comment__icon {
+  color: #388bfd;
+}
+.markpad-gemini-comment__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--vscode-icon-foreground, #cccccc);
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.markpad-gemini-comment__close:hover {
+  background: var(--vscode-toolbar-hoverBackground, rgba(90, 93, 94, 0.31));
+}
+.markpad-gemini-comment__quote {
+  background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+  border-left: 3px solid var(--vscode-textLink-activeForeground, #388bfd);
+  padding: 4px 8px;
+  border-radius: 2px;
+  max-height: 60px;
+  overflow: hidden;
+}
+.markpad-gemini-comment__quote-content {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--vscode-descriptionForeground, #999999);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.markpad-gemini-comment__body {
+  width: 100%;
+}
+.markpad-gemini-comment__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--vscode-input-background, #3c3c3c);
+  color: var(--vscode-input-foreground, #cccccc);
+  border: 1px solid var(--vscode-input-border, #3c3c3c);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  resize: vertical;
+  min-height: 52px;
+  outline: none;
+}
+.markpad-gemini-comment__textarea:focus {
+  border-color: var(--vscode-focusBorder, #007fd4);
+}
+.markpad-gemini-comment__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+.markpad-gemini-comment__hint {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #888888);
+}
+.markpad-gemini-comment__send {
+  padding: 3px 10px;
+  background: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, #ffffff);
+  border: 1px solid var(--vscode-button-border, transparent);
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.markpad-gemini-comment__send:hover {
+  background: var(--vscode-button-hoverBackground, #1177bb);
 }

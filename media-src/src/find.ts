@@ -19,6 +19,12 @@ const HL_CURRENT = 'markpad-find-current'
 
 let wired = false
 
+let openFindFn: (() => void) | null = null
+
+export function openFind() {
+  openFindFn?.()
+}
+
 export function enableFind() {
   if (wired) return
   wired = true
@@ -36,15 +42,21 @@ export function enableFind() {
       ? (window as any).CSS.highlights
       : null
 
-  function irElement(): HTMLElement | undefined {
-    return (window as any).vditor?.vditor?.ir?.element as HTMLElement | undefined
+  function activeEditorElement(): HTMLElement | undefined {
+    const vd = (window as any).vditor?.vditor
+    if (!vd) return undefined
+    const currentMode = vd.currentMode
+    if (currentMode && vd[currentMode]?.element) {
+      return vd[currentMode].element as HTMLElement
+    }
+    return (vd.ir?.element || vd.wysiwyg?.element || vd.sv?.element) as HTMLElement | undefined
   }
 
   /* -------------------------------------------------------------- match model */
 
   // Collect every match of `query` as a Range over the editor's text nodes.
   function computeMatches(): Range[] {
-    const root = irElement()
+    const root = activeEditorElement()
     if (!root || !query) return []
 
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
@@ -157,7 +169,7 @@ export function enableFind() {
 
   function firstMatchFromCaret(): number {
     const sel = window.getSelection()
-    const root = irElement()
+    const root = activeEditorElement()
     if (!sel || !sel.rangeCount || !root) return 0
     const caret = sel.getRangeAt(0)
     if (!root.contains(caret.startContainer)) return 0
@@ -242,8 +254,10 @@ export function enableFind() {
       highlightApi.delete(HL_CURRENT)
     }
     if (status) status.textContent = ''
-    irElement()?.focus()
+    activeEditorElement()?.focus()
   }
+
+  openFindFn = open
 
   // Capture phase so we win over anything else listening for Ctrl/Cmd+F.
   document.addEventListener(
@@ -252,7 +266,7 @@ export function enableFind() {
       if (
         (e.ctrlKey || e.metaKey) &&
         !e.altKey &&
-        (e.key === 'f' || e.key === 'F')
+        (e.code === 'KeyF' || e.key === 'f' || e.key === 'F')
       ) {
         e.preventDefault()
         e.stopPropagation()

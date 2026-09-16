@@ -8,6 +8,7 @@
  * (best effort — Ctrl+V always works through Vditor's own handler).
  */
 import { readAloud, ttsAvailable } from './tts'
+import { openGeminiComment } from './gemini-comment'
 
 const MENU_CLASS = 'markpad-ctx'
 let menu: HTMLElement | null = null
@@ -32,6 +33,25 @@ async function paste() {
   }
 }
 
+// "Bring to Gemini": copy the selection, send it to Google Antigravity
+// via antigravity.addContext, and focus the chat. If no selection, focuses the chat.
+function bringToGemini() {
+  const text = (window.getSelection()?.toString() || '')
+    .replace(/\u00a0/g, ' ')
+    .trim()
+  if (text) {
+    navigator.clipboard.writeText(text).catch(() => {})
+  }
+  ;(window as any).vscode?.postMessage?.({ command: 'bring-to-antigravity', text })
+  if (text) {
+    try {
+      ;(window as any).vditor?.tip?.show?.('Sent to Gemini Antigravity', 2000)
+    } catch {
+      /* tip is best-effort */
+    }
+  }
+}
+
 // "Bring to Claude": copy the selection and focus Claude Code's input. There's
 // no API to inject text into Claude's chat, so we copy + focus its input and the
 // user finishes with a single paste.
@@ -51,15 +71,35 @@ function bringToClaude() {
 
 type Item = { label: string; run: () => void } | 'sep'
 
-function items(): Item[] {
-  const hasSelection = !!(window.getSelection()?.toString() || '').trim()
+function items(
+  snapText: string,
+  snapRange: Range | null,
+  clickPos: { x: number; y: number }
+): Item[] {
+  const hasSelection = !!snapText
 
   const list: Item[] = []
   if (ttsAvailable()) {
     list.push({ label: 'Read aloud', run: readAloud }, 'sep')
   }
   if (hasSelection) {
-    list.push({ label: 'Bring to Claude  (Ctrl+Alt+C)', run: bringToClaude }, 'sep')
+    list.push(
+      {
+        label: 'Comment with Gemini  (Ctrl+Alt+I)',
+        run: () => openGeminiComment(snapText, snapRange, clickPos),
+      },
+      { label: 'Bring to Gemini  (Ctrl+Alt+G)', run: bringToGemini },
+      { label: 'Bring to Claude  (Ctrl+Alt+C)', run: bringToClaude },
+      'sep'
+    )
+  } else {
+    list.push(
+      {
+        label: 'Ask Gemini  (Ctrl+Alt+I)',
+        run: () => openGeminiComment('', null, clickPos),
+      },
+      'sep'
+    )
   }
   list.push(
     {
@@ -77,10 +117,15 @@ function items(): Item[] {
 
 function show(x: number, y: number) {
   close()
+  const sel = window.getSelection()
+  const snapText = (sel?.toString() || '').replace(/\u00a0/g, ' ').trim()
+  const snapRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null
+  const clickPos = { x, y }
+
   menu = document.createElement('div')
   menu.className = MENU_CLASS
   menu.contentEditable = 'false'
-  for (const it of items()) {
+  for (const it of items(snapText, snapRange, clickPos)) {
     if (it === 'sep') {
       const s = document.createElement('div')
       s.className = MENU_CLASS + '__sep'
@@ -92,8 +137,11 @@ function show(x: number, y: number) {
     el.textContent = it.label
     el.addEventListener('mousedown', (e) => {
       e.preventDefault() // keep selection / editor focus
+      e.stopPropagation()
       close()
-      it.run()
+      setTimeout(() => {
+        it.run()
+      }, 0)
     })
     menu.appendChild(el)
   }
@@ -116,6 +164,34 @@ export function enableContextMenu() {
       e.stopPropagation()
       show(e.clientX, e.clientY)
     })
+    // Ctrl+Alt+G / Ctrl+L → bring selection to Gemini Antigravity
+    el.addEventListener(
+      'keydown',
+      (e: KeyboardEvent) => {
+        const isCtrlAltG = e.ctrlKey && e.altKey && !e.shiftKey && e.code === 'KeyG'
+        const isCtrlL = (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.code === 'KeyL'
+        if (isCtrlAltG || isCtrlL) {
+          e.preventDefault()
+          e.stopImmediatePropagation()
+          bringToGemini()
+        }
+      },
+      true
+    )
+    // Ctrl+Alt+I / Ctrl+I → open inline comment for Gemini Antigravity
+    el.addEventListener(
+      'keydown',
+      (e: KeyboardEvent) => {
+        const isCtrlAltI = e.ctrlKey && e.altKey && !e.shiftKey && e.code === 'KeyI'
+        const isCtrlI = (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.code === 'KeyI'
+        if (isCtrlAltI || isCtrlI) {
+          e.preventDefault()
+          e.stopImmediatePropagation()
+          openGeminiComment()
+        }
+      },
+      true
+    )
     // Ctrl+Alt+C → copy selection for Claude (KeyC is layout-independent).
     el.addEventListener(
       'keydown',
@@ -138,5 +214,14 @@ export function enableContextMenu() {
     true
   )
   document.addEventListener('keydown', (e) => e.key === 'Escape' && close(), true)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close()
+    const isCtrlAltI = e.ctrlKey && e.altKey && !e.shiftKey && (e.code === 'KeyI' || e.key === 'i' || e.key === 'I')
+    if (isCtrlAltI) {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      openGeminiComment()
+    }
+  }, true)
   document.addEventListener('scroll', close, true)
 }
