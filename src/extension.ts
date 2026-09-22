@@ -231,6 +231,8 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     // Tracks the markdown the webview currently has, so its own edits (skipped —
     // avoids loops) can be told apart from external ones (always synced).
     let lastContent = ''
+    let lastAntigravityText = ''
+    let lastAntigravityTime = 0
 
     // Send update to webview
     const updateWebview = (props: { type?: 'init' | 'update'; options?: any; theme?: 'dark' | 'light' } = {}) => {
@@ -356,6 +358,12 @@ class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
         case 'bring-to-antigravity': {
           const text = (message.text || '').trim()
+          const now = Date.now()
+          if (text && text === lastAntigravityText && now - lastAntigravityTime < 500) {
+            break
+          }
+          lastAntigravityText = text
+          lastAntigravityTime = now
           if (text) {
             try {
               await vscode.commands.executeCommand('antigravity.addContext', text)

@@ -11,6 +11,7 @@ let popup: HTMLDivElement | null = null
 let currentSelectedText = ''
 let activeCaretRange: Range | null = null
 let openedTime = 0
+let isSubmitting = false
 
 function ensurePopup(): HTMLDivElement {
   if (popup) return popup
@@ -75,7 +76,6 @@ function ensurePopup(): HTMLDivElement {
     e.stopPropagation()
   })
 
-  // Close when clicking outside
   // Close when clicking outside, but ignore clicks within 250ms of opening
   document.addEventListener('mousedown', (e) => {
     if (Date.now() - openedTime < 250) return
@@ -89,7 +89,6 @@ function ensurePopup(): HTMLDivElement {
   return popup
 }
 
-export function openGeminiComment() {
 export function openGeminiComment(
   presetText?: string,
   presetRange?: Range | null,
@@ -99,9 +98,6 @@ export function openGeminiComment(
   openedTime = Date.now()
 
   const sel = window.getSelection()
-  currentSelectedText = (sel?.toString() || '')
-    .replace(/\u00a0/g, ' ')
-    .trim()
   const rawSelected =
     presetText !== undefined
       ? presetText
@@ -109,23 +105,10 @@ export function openGeminiComment(
   currentSelectedText = rawSelected
 
   let anchorRect: DOMRect | null = null
-  if (sel && sel.rangeCount > 0) {
-    const range = sel.getRangeAt(0)
-    activeCaretRange = range.cloneRange()
-    const rects = range.getClientRects()
   const rangeToUse = presetRange || (sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null)
   if (rangeToUse) {
     activeCaretRange = rangeToUse.cloneRange()
     const rects = rangeToUse.getClientRects()
-    if (rects.length > 0) {
-      anchorRect = rects[rects.length - 1]
-    } else {
-      anchorRect = range.getBoundingClientRect()
-      for (let i = rects.length - 1; i >= 0; i--) {
-        if (rects[i].width > 0 && rects[i].height > 0) {
-          anchorRect = rects[i]
-          break
-        }
     for (let i = rects.length - 1; i >= 0; i--) {
       if (rects[i].width > 0 && rects[i].height > 0) {
         anchorRect = rects[i]
@@ -144,8 +127,6 @@ export function openGeminiComment(
   if (currentSelectedText) {
     quoteEl.style.display = 'block'
     const displaySnippet =
-      currentSelectedText.length > 160
-        ? currentSelectedText.slice(0, 157) + '...'
       currentSelectedText.length > 180
         ? currentSelectedText.slice(0, 177) + '...'
         : currentSelectedText
@@ -192,7 +173,6 @@ export function openGeminiComment(
 
   setTimeout(() => {
     textarea.focus()
-  }, 30)
   }, 50)
 }
 
@@ -209,7 +189,7 @@ export function closeGeminiComment() {
 }
 
 function submitGeminiComment() {
-  if (!popup) return
+  if (!popup || isSubmitting) return
   const textarea = popup.querySelector(`.${POPUP_ID}__textarea`) as HTMLTextAreaElement
   const comment = (textarea.value || '').trim()
 
@@ -217,6 +197,8 @@ function submitGeminiComment() {
     closeGeminiComment()
     return
   }
+
+  isSubmitting = true
 
   // Format message payload for Gemini Antigravity
   let payload = ''
@@ -241,18 +223,13 @@ function submitGeminiComment() {
     command: 'bring-to-antigravity',
     text: payload,
   })
-  const vscodeApi = (window as any).vscode
-  if (vscodeApi && vscodeApi.postMessage) {
-    vscodeApi.postMessage({
-      command: 'bring-to-antigravity',
-      text: payload,
-    })
-  }
 
   try {
     ;(window as any).vditor?.tip?.show?.('Sent comment to Gemini Antigravity', 2200)
   } catch {}
 
   closeGeminiComment()
+  setTimeout(() => {
+    isSubmitting = false
+  }, 300)
 }
-
